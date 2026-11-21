@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>ماموریت انرژی | مدیریت هوشمند و بازی‌وار انرژی خانه</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+(()=>{
+  let t;
+  try{const s=localStorage.getItem('energy-theme');if(s==='dark'||s==='light')t=s}catch(e){}
+  if(!t)t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  document.documentElement.dataset.theme=t;
+})();
+</script>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F2FBF7;
+  --bg-dots:radial-gradient(rgba(16,185,129,.15) 1.3px,transparent 1.3px);
+  --bg-wash:radial-gradient(circle at 8% 6%,rgba(16,185,129,.16),transparent 36%),
+            radial-gradient(circle at 92% 10%,rgba(139,92,246,.15),transparent 36%),
+            radial-gradient(circle at 82% 88%,rgba(6,182,212,.14),transparent 38%);
+  --paper:#FFFFFF;
+  --surface-2:#F8FAFC;
+  --surface-3:#E2E8F0;
+  --border:#E2E8F0;
+  --border-strong:#CBD5E1;
+  --ink:#0F172A;
+  --ink2:#334155;
+  --mute:#64748B;
+
+  --emerald:#10B981; --emerald-d:#059669; --emerald-soft:#DCFCE7; --emerald-ink:#047857;
+  --cyan:#06B6D4;    --cyan-d:#0891B2;    --cyan-soft:#CFFAFE;    --cyan-ink:#0E7490;
+  --amber:#F59E0B;   --amber-d:#D97706;   --amber-soft:#FEF3C7;   --amber-ink:#B45309;
+  --coral:#F43F5E;   --coral-d:#E11D48;   --coral-soft:#FFE4E6;   --coral-ink:#BE123C;
+  --violet:#8B5CF6;  --violet-d:#7C3AED;  --violet-soft:#EDE9FE;  --violet-ink:#6D28D9;
+
+  --side-bg:#FFFFFF;
+  --side-border:#E2E8F0;
+  --side-hover:#F1F5F9;
+  --chart-grid:#E2E8F0;
+  --chart-prev:#CBD5E1;
+  --chart-muted:#64748B;
+
+  --r:24px; --r-md:18px; --r-sm:14px;
+  --sidebar-w:270px;
+  --shadow:0 10px 26px -8px rgba(15,23,42,.08),0 2px 6px rgba(15,23,42,.03);
+  --shadow-float:0 22px 48px -12px rgba(15,23,42,.22);
+  --bounce:cubic-bezier(.34,1.56,.64,1);
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0B1120;
+  --bg-dots:radial-gradient(rgba(56,189,248,.12) 1.3px,transparent 1.3px);
+  --bg-wash:radial-gradient(circle at 10% 8%,rgba(16,185,129,.18),transparent 38%),
+            radial-gradient(circle at 90% 10%,rgba(139,92,246,.2),transparent 38%),
+            radial-gradient(circle at 75% 88%,rgba(6,182,212,.15),transparent 40%);
+  --paper:#131C31;
+  --surface-2:#1B2742;
+  --surface-3:#2C3B5E;
+  --border:#263554;
+  --border-strong:#3A4F7A;
+  --ink:#F8FAFC;
+  --ink2:#CBD5E1;
+  --mute:#94A3B8;
+
+  --emerald-soft:rgba(16,185,129,.18); --emerald-ink:#34D399;
+  --cyan-soft:rgba(6,182,212,.18);     --cyan-ink:#22D3EE;
+  --amber-soft:rgba(245,158,11,.18);   --amber-ink:#FBBF24;
+  --coral-soft:rgba(244,63,94,.20);    --coral-ink:#FB7185;
+  --violet-soft:rgba(139,92,246,.22);  --violet-ink:#A78BFA;
+
+  --side-bg:#0F172A;
+  --side-border:#1E293B;
+  --side-hover:#1E293B;
+  --chart-grid:#243352;
+  --chart-prev:#334155;
+  --chart-muted:#94A3B8;
+  --shadow:0 12px 30px -8px rgba(0,0,0,.45),0 0 0 1px rgba(56,189,248,.07);
+  --shadow-float:0 24px 52px -12px rgba(0,0,0,.65);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{min-height:100%;scrollbar-gutter:stable}
+body{
+  min-height:100vh;background-color:var(--bg);
+  background-image:var(--bg-wash),var(--bg-dots);
+  background-size:100% 100%,24px 24px;background-attachment:fixed;
+  color:var(--ink);
+  font-family:"Vazirmatn","IRANSansX","Segoe UI",Tahoma,sans-serif;
+  font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+button,input,select{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer;touch-action:manipulation}
+button:disabled{cursor:not-allowed;opacity:.6}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+svg.icon{display:block;width:20px;height:20px;flex:none}
+.num{font-variant-numeric:tabular-nums}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--emerald)}
+
+/* Shell & Sidebar */
+.app{min-height:100vh;padding-inline-start:var(--sidebar-w)}
+.side{
+  position:fixed;inset-block:0;inset-inline-start:0;width:var(--sidebar-w);height:100dvh;
+  display:flex;flex-direction:column;gap:12px;padding:18px 14px 16px;
+  background:var(--side-bg);border-inline-end:2px solid var(--side-border);z-index:40;overflow:hidden;
+}
+.brand{display:flex;align-items:center;gap:12px;padding:4px 6px 14px;border-bottom:2px dashed var(--side-border);flex:none}
+.logo-badge{
+  width:48px;height:48px;border-radius:16px;flex:none;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--emerald),var(--cyan));
+  box-shadow:0 4px 0 var(--emerald-d),0 8px 18px rgba(16,185,129,.35);
+  cursor:pointer;transition:transform .22s var(--bounce);
+}
+.logo-badge:hover{transform:scale(1.08) rotate(-5deg)}
+.logo-badge svg{width:30px;height:30px}
+.brand b{display:block;font-size:17px;font-weight:900;color:var(--ink)}
+.brand small{display:block;font-size:11px;font-weight:700;color:var(--emerald-ink)}
+
+.nav{display:flex;flex-direction:column;flex:1;min-height:0;gap:5px;overflow-y:auto;padding:2px}
+.nav-l{padding:10px 10px 3px;font-size:10.5px;font-weight:800;color:var(--mute)}
+.nav-l:first-child{padding-top:2px}
+.nav button{
+  display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:7px 10px;
+  border-radius:15px;border:2px solid transparent;color:var(--ink2);font-size:13px;font-weight:700;text-align:right;
+  transition:transform .16s var(--bounce),background .15s,border-color .15s;
+}
+.nav button .nav-ic{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;flex:none;color:#fff;transition:transform .2s var(--bounce)}
+.nav button .nav-ic svg{width:17px;height:17px}
+.nav button:hover{background:var(--side-hover);color:var(--ink);transform:translateX(-3px)}
+.nav button:hover .nav-ic{transform:scale(1.09) rotate(-5deg)}
+.nav button.on{background:var(--emerald-soft);border-color:var(--emerald);color:var(--emerald-ink);box-shadow:0 3px 0 rgba(16,185,129,.28);font-weight:800}
+html[data-theme="dark"] .nav button.on{background:rgba(16,185,129,.16);color:#6EE7B7;box-shadow:0 3px 0 rgba(5,150,105,.5)}
+.nav .pill{margin-inline-start:auto;min-width:22px;height:22px;padding:0 6px;border-radius:99px;display:grid;place-items:center;background:linear-gradient(135deg,var(--coral),var(--amber));color:#fff;font-size:10.5px;font-weight:900}
+.nav .pill.v{background:linear-gradient(135deg,var(--violet),var(--cyan))}
+
+.side-foot{
+  flex:none;padding:13px;border-radius:20px;
+  background:linear-gradient(145deg,#1E1B4B,#312E81 60%,#4338CA);
+  color:#fff;border:2px solid rgba(167,139,250,.35);box-shadow:0 8px 20px rgba(49,46,129,.28);
+}
+.side-foot .row{display:flex;align-items:center;gap:10px}
+.side-foot .avatar{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--amber),var(--coral));color:#fff;font-size:16px;font-weight:900;border:2px solid rgba(255,255,255,.35)}
+.side-foot b{display:block;font-size:13px;font-weight:800}
+.side-foot small{display:block;font-size:11px;color:#C4B5FD;font-weight:700}
+.xp-bar{height:10px;margin-top:10px;border-radius:99px;background:rgba(255,255,255,.16);overflow:hidden;padding:2px}
+.xp-bar i{display:block;height:100%;width:68%;border-radius:99px;background:repeating-linear-gradient(-45deg,#34D399,#34D399 8px,#10B981 8px,#10B981 16px);background-size:22px 22px;animation:xp-move 1.4s linear infinite;transition:width .5s var(--bounce)}
+@keyframes xp-move{from{background-position:0 0}to{background-position:22px 0}}
+.side-foot .meta{display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;font-weight:700;color:#E0E7FF}
+
+/* Main & Top Header */
+.main{width:100%;max-width:1520px;min-width:0;margin-inline:auto;padding:20px clamp(14px,2.5vw,32px) 64px}
+.top{
+  display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:22px;padding:14px 18px;
+  background:var(--paper);border:2px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);position:relative;z-index:35;
+}
+.top-heading{flex:1 1 220px;min-width:0}
+.top h1{font-size:21px;font-weight:900;line-height:1.35;color:var(--ink)}
+.top p{font-size:12px;font-weight:600;color:var(--mute);margin-top:2px}
+.top-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+
+.stat-pill{
+  display:inline-flex;align-items:center;gap:6px;height:42px;padding:0 13px;border-radius:14px;
+  font-size:13px;font-weight:900;border:2px solid transparent;transition:transform .16s var(--bounce);user-select:none;
+}
+.stat-pill svg.icon{width:17px;height:17px}
+.stat-pill:hover{transform:translateY(-2px)}
+.stat-pill:active{transform:translateY(2px)}
+.stat-pill.streak{background:var(--amber-soft);border-color:rgba(245,158,11,.45);color:var(--amber-ink);box-shadow:0 3px 0 rgba(217,119,6,.3)}
+.stat-pill.points{background:var(--violet-soft);border-color:rgba(139,92,246,.45);color:var(--violet-ink);box-shadow:0 3px 0 rgba(124,58,237,.3)}
+.stat-pill.bump{animation:pill-bump .45s var(--bounce)}
+@keyframes pill-bump{0%{transform:scale(1)}45%{transform:scale(1.16) rotate(-3deg)}100%{transform:scale(1)}}
+
+.search-wrap{position:relative;width:220px;flex:1 1 170px;min-width:150px}
+.search{display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;background:var(--surface-2);border:2px solid var(--border);border-radius:14px;color:var(--mute);transition:border-color .18s,box-shadow .18s}
+.search:focus-within{border-color:var(--cyan);background:var(--paper);box-shadow:0 0 0 4px var(--cyan-soft)}
+.search input{flex:1;min-width:0;height:100%;border:0;background:none;outline:0;font-size:12.5px;font-weight:700;color:var(--ink)}
+.search-results{position:absolute;inset:calc(100% + 10px) 0 auto;min-width:300px;max-height:360px;padding:8px;background:var(--paper);border:2px solid var(--border);border-radius:20px;box-shadow:var(--shadow-float);overflow-y:auto;z-index:90}
+.search-results[hidden]{display:none}
+.search-option{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:14px;text-align:right;transition:background .15s}
+.search-option:hover,.search-option:focus-visible{background:var(--emerald-soft)}
+.search-option>svg{color:var(--emerald);flex:none}
+.search-option>span{flex:1;min-width:0}
+.search-option b{display:block;font-size:12.5px;font-weight:800;color:var(--ink)}
+.search-option small{display:block;font-size:11px;color:var(--mute)}
+.search-empty{padding:16px 10px;text-align:center;color:var(--mute);font-size:12.5px;font-weight:700}
+
+.ibtn-wrap{position:relative}
+.ibtn{
+  position:relative;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
+  background:var(--surface-2);border:2px solid var(--border);color:var(--ink2);box-shadow:0 3px 0 var(--border);
+  transition:transform .16s var(--bounce),border-color .16s,background .16s;
+}
+.ibtn:hover{border-color:var(--cyan);background:var(--cyan-soft);color:var(--cyan-ink);transform:translateY(-2px)}
+.ibtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--border)}
+.ibtn .dot{position:absolute;top:5px;left:5px;width:10px;height:10px;border-radius:50%;background:var(--coral);border:2px solid var(--paper);animation:ping-dot 1.8s infinite}
+@keyframes ping-dot{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(244,63,94,.6)}50%{transform:scale(1.15);box-shadow:0 0 0 6px rgba(244,63,94,0)}}
+
+.notif-pop{
+  position:absolute;top:calc(100% + 12px);left:0;width:min(350px,calc(100vw - 28px));
+  padding:14px;border-radius:22px;background:var(--paper);border:2px solid var(--border);box-shadow:var(--shadow-float);z-index:95;
+  animation:pop-view .2s var(--bounce);
+}
+.notif-pop[hidden]{display:none}
+.notif-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:2px dashed var(--border)}
+.notif-h b{font-size:14px;font-weight:900;display:flex;align-items:center;gap:6px}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:14px;margin-bottom:7px;background:var(--surface-2);border:1.5px solid transparent;cursor:pointer;transition:border-color .15s}
+.notif-item.unread{background:var(--emerald-soft);border-color:rgba(16,185,129,.35)}
+.notif-item:hover{border-color:var(--cyan)}
+.notif-item .ni-ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;color:#fff;flex:none}
+.notif-item b{display:block;font-size:12.5px;font-weight:800}
+.notif-item small{display:block;font-size:11px;color:var(--mute);font-weight:600}
+
+/* Shared Cards & 3D Buttons */
+.view{display:none;animation:pop-view .24s var(--ease)}
+.view.on{display:block}
+@keyframes pop-view{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.grid{display:grid;gap:20px;min-width:0}
+.panel,.bill,.draw{min-width:0;background:var(--paper);border:2px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
+.panel,.draw{padding:22px}
+.ph{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.ph>div:first-child{flex:1;min-width:160px}
+.ph h3{font-size:16.5px;font-weight:900;color:var(--ink);display:flex;align-items:center;gap:8px}
+.ph h3 svg.icon{color:var(--emerald)}
+.ph small{display:block;margin-top:2px;font-size:12px;font-weight:600;color:var(--mute)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:8px 18px;
+  border-radius:16px;font-size:13px;font-weight:800;border:2px solid transparent;
+  transition:transform .14s var(--bounce),box-shadow .14s,filter .14s;user-select:none;
+}
+.btn svg.icon{width:17px;height:17px}
+.btn.sm{min-height:36px;padding:5px 12px;font-size:12px;border-radius:12px}
+.btn.p{background:linear-gradient(180deg,#10B981,#059669);color:#fff;box-shadow:0 4px 0 #047857,0 8px 16px rgba(16,185,129,.25)}
+.btn.p:hover{filter:brightness(1.06);transform:translateY(-2px);box-shadow:0 6px 0 #047857}
+.btn.p:active{transform:translateY(3px);box-shadow:0 1px 0 #047857}
+.btn.l{background:linear-gradient(180deg,#FBBF24,#F59E0B);color:#1E1B4B;box-shadow:0 4px 0 #B45309}
+.btn.l:hover{filter:brightness(1.05);transform:translateY(-2px);box-shadow:0 6px 0 #B45309}
+.btn.l:active{transform:translateY(3px);box-shadow:0 1px 0 #B45309}
+.btn.v{background:linear-gradient(180deg,#8B5CF6,#7C3AED);color:#fff;box-shadow:0 4px 0 #5B21B6}
+.btn.v:hover{filter:brightness(1.06);transform:translateY(-2px);box-shadow:0 6px 0 #5B21B6}
+.btn.v:active{transform:translateY(3px);box-shadow:0 1px 0 #5B21B6}
+.btn.c{background:linear-gradient(180deg,#06B6D4,#0891B2);color:#fff;box-shadow:0 4px 0 #0E7490}
+.btn.c:hover{filter:brightness(1.06);transform:translateY(-2px);box-shadow:0 6px 0 #0E7490}
+.btn.c:active{transform:translateY(3px);box-shadow:0 1px 0 #0E7490}
+.btn.g{background:var(--surface-2);border-color:var(--border);color:var(--ink2);box-shadow:0 4px 0 var(--border)}
+.btn.g:hover{border-color:var(--cyan);color:var(--cyan-ink);background:var(--cyan-soft);transform:translateY(-2px)}
+.btn.g:active{transform:translateY(3px);box-shadow:0 1px 0 var(--border)}
+.btn.glass-btn{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.32);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.btn.glass-btn:hover{background:rgba(255,255,255,.26);transform:translateY(-2px)}
+.btn.glass-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;line-height:1.5}
+.tag.up{background:var(--coral-soft);color:var(--coral-ink)}
+.tag.dn{background:var(--emerald-soft);color:var(--emerald-ink)}
+.tag.n{background:var(--surface-2);color:var(--ink2);border:1.5px solid var(--border)}
+.tag.amber{background:var(--amber-soft);color:var(--amber-ink)}
+.tag.violet{background:var(--violet-soft);color:var(--violet-ink)}
+.tag.cyan{background:var(--cyan-soft);color:var(--cyan-ink)}
+
+.seg{display:inline-flex;gap:4px;padding:4px;background:var(--surface-2);border:2px solid var(--border);border-radius:16px}
+.seg button{padding:6px 14px;min-height:34px;border-radius:12px;font-size:12.5px;font-weight:800;color:var(--mute);transition:all .16s var(--bounce)}
+.seg button.on{background:var(--emerald);color:#fff;box-shadow:0 3px 0 var(--emerald-d);transform:translateY(-1px)}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{padding:7px 14px;min-height:38px;border-radius:14px;border:2px solid var(--border);background:var(--surface-2);font-size:12.5px;font-weight:800;color:var(--ink2);box-shadow:0 3px 0 var(--border);transition:all .16s var(--bounce)}
+.chip:hover{border-color:var(--violet);transform:translateY(-2px)}
+.chip.on{background:var(--violet);border-color:var(--violet);color:#fff;box-shadow:0 3px 0 var(--violet-d)}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--border)}
+
+.avatar{display:grid;place-items:center;flex:none;width:42px;height:42px;border-radius:14px;font-size:15px;font-weight:900;color:#fff}
+.rows{display:flex;flex-direction:column;gap:10px}
+.rowi{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:var(--surface-2);border:2px solid transparent;transition:transform .18s var(--bounce),border-color .18s}
+.rowi:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.rowi .ic{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:13px;color:#fff}
+.rowi .t{flex:1;min-width:0}
+.rowi .t b{display:block;font-size:13.5px;font-weight:800}
+.rowi .t small{display:block;font-size:11.5px;font-weight:600;color:var(--mute)}
+.meter{height:9px;margin-top:7px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+.meter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--emerald),var(--cyan));transition:width .6s var(--ease)}
+
+/* 1. Dashboard Hero & KPIs */
+.hero{
+  position:relative;display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:24px;
+  padding:26px 28px;border-radius:28px;
+  background:linear-gradient(135deg,#059669 0%,#0891B2 52%,#4F46E5 100%);
+  color:#fff;overflow:hidden;border:2px solid rgba(255,255,255,.22);
+  box-shadow:0 16px 36px -10px rgba(6,182,212,.38);
+}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 86% 18%,rgba(251,191,36,.3),transparent 36%),
+             radial-gradient(circle at 10% 90%,rgba(52,211,153,.32),transparent 42%);
+}
+.hero-left{position:relative;z-index:2;display:flex;flex-direction:column;gap:14px}
+.mascot-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.mascot-wrap{width:78px;height:78px;flex:none;cursor:pointer;transition:transform .25s var(--bounce)}
+.mascot-wrap:hover{transform:scale(1.12) rotate(5deg)}
+.mascot-svg{width:100%;height:100%;animation:bob 3s ease-in-out infinite;filter:drop-shadow(0 8px 14px rgba(0,0,0,.22))}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.mascot-eye{animation:blink 4.2s infinite;transform-origin:center}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.speech{
+  position:relative;flex:1;min-width:210px;padding:11px 16px;border-radius:18px;
+  background:rgba(255,255,255,.18);backdrop-filter:blur(10px);border:2px solid rgba(255,255,255,.32);
+  font-size:13px;font-weight:700;line-height:1.6;
+}
+.speech::before{content:"";position:absolute;top:50%;right:-10px;transform:translateY(-50%);border-width:8px 0 8px 10px;border-style:solid;border-color:transparent transparent transparent rgba(255,255,255,.32)}
+.speech b{color:#FEF08A}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:8px;width:max-content;padding:4px 12px;border-radius:99px;background:rgba(15,23,42,.26);border:1px solid rgba(255,255,255,.22);font-size:11.5px;font-weight:800;color:#ECFDF5}
+.pulse{width:8px;height:8px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 4px rgba(74,222,128,.35)}
+.hero h2{font-size:clamp(21px,2.4vw,29px);font-weight:900;line-height:1.42}
+.hero h2 em{font-style:normal;color:#FEF08A;text-decoration:underline;text-decoration-color:rgba(254,240,138,.45);text-underline-offset:6px}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px}
+.hero-chip{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:16px;background:rgba(15,23,42,.25);border:1.5px solid rgba(255,255,255,.22)}
+.hero-chip svg.icon{width:22px;height:22px;color:#FEF08A}
+.hero-chip b{display:block;font-size:19px;font-weight:900;line-height:1.2}
+.hero-chip small{display:block;font-size:10.5px;color:#E0F2FE;font-weight:600}
+.hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+
+.score{position:relative;z-index:2;display:grid;place-items:center}
+.ring{width:194px;height:194px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.22))}
+.ring-c{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring-c small{display:block;font-size:11px;font-weight:700;color:#E0F2FE}
+.ring-c b{display:block;font-size:44px;font-weight:900;line-height:1.1}
+.ring-c .grade{display:inline-block;margin-top:4px;padding:3px 12px;border-radius:99px;background:#FEF08A;color:#1E1B4B;font-size:11px;font-weight:900;box-shadow:0 3px 0 #CA8A04}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.kpi{padding:18px;border-radius:var(--r);background:var(--paper);border:2px solid var(--border);box-shadow:var(--shadow);transition:transform .2s var(--bounce),border-color .2s}
+.kpi:hover{transform:translateY(-4px);border-color:var(--border-strong)}
+.kpi .k-l{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;color:var(--ink2)}
+.kpi .k-i{width:36px;height:36px;border-radius:13px;display:grid;place-items:center;color:#fff;flex:none}
+.kpi .k-v{margin:10px 0 2px;font-size:26px;font-weight:900;line-height:1.25}
+.kpi .k-v small{margin-inline-start:4px;font-size:11.5px;font-weight:700;color:var(--mute)}
+.spark{display:block;width:100%;height:28px;margin-top:8px}
+
+/* 2. Smart Home Explorer */
+.sh-monitor{
+  display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:center;padding:24px 26px;border-radius:28px;
+  background:linear-gradient(135deg,#0F172A,#1E293B 55%,#1E1B4B);color:#fff;
+  border:2px solid rgba(56,189,248,.28);box-shadow:0 16px 36px -10px rgba(15,23,42,.38);
+}
+.sh-watts{font-size:46px;font-weight:900;line-height:1.15;color:#34D399}
+.sh-gauge{height:14px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;margin:12px 0 10px}
+.sh-gauge i{display:block;height:100%;border-radius:99px;transition:width .45s var(--ease),background .35s}
+.sh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.dev-card{
+  padding:18px;border-radius:22px;background:var(--paper);border:2px solid var(--border);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:12px;transition:transform .2s var(--bounce),border-color .2s,background .2s;
+}
+.dev-card:hover{transform:translateY(-3px)}
+.dev-card.on{border-color:var(--emerald);background:linear-gradient(180deg,var(--paper),var(--emerald-soft))}
+.dev-card.on.heavy{border-color:var(--coral);background:linear-gradient(180deg,var(--paper),var(--coral-soft))}
+html[data-theme="dark"] .dev-card.on{background:linear-gradient(180deg,var(--paper),rgba(16,185,129,.12))}
+html[data-theme="dark"] .dev-card.on.heavy{background:linear-gradient(180deg,var(--paper),rgba(244,63,94,.14))}
+.dev-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dev-ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;color:#fff;flex:none}
+.dev-ic svg.icon{width:24px;height:24px}
+.dev-info b{display:block;font-size:14.5px;font-weight:900}
+.dev-info small{display:block;font-size:11.5px;font-weight:700;color:var(--mute)}
+.dev-ctrls{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:10px;border-top:1.5px dashed var(--border)}
+.eco-btn{padding:4px 10px;border-radius:10px;border:2px solid var(--border);background:var(--surface-2);font-size:11px;font-weight:800;color:var(--ink2);transition:all .15s}
+.eco-btn.on{background:var(--emerald);border-color:var(--emerald-d);color:#fff}
+
+/* Charts */
+.chart{position:relative;width:100%;min-width:0}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart text{font-family:"Vazirmatn","IRANSansX",Tahoma,sans-serif}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:10px}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:4px;flex:none}
+.tip{position:absolute;pointer-events:none;z-index:20;padding:10px 14px;border-radius:16px;background:#0F172A;color:#F8FAFC;border:2px solid rgba(56,189,248,.4);font-size:12px;font-weight:700;white-space:nowrap;opacity:0;transform:translate(50%,-112%);transition:opacity .14s;box-shadow:0 12px 26px rgba(0,0,0,.3)}
+.tip.on{opacity:1}
+.tip b{color:#34D399}
+.bar-anim{transform-box:fill-box;transform-origin:bottom;animation:bar-grow .45s var(--bounce) backwards}
+@keyframes bar-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+
+/* 3. Smart Bills */
+.profile{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}
+.field label{display:block;margin-bottom:6px;font-size:12px;font-weight:800;color:var(--ink2)}
+.stepper{display:flex;align-items:center;height:44px;padding:4px;border-radius:15px;background:var(--surface-2);border:2px solid var(--border);gap:4px}
+.stepper button{width:34px;height:34px;border-radius:11px;background:var(--paper);border:2px solid var(--border);font-size:19px;font-weight:900;box-shadow:0 3px 0 var(--border)}
+.stepper button:hover{background:var(--emerald-soft);border-color:var(--emerald)}
+.stepper button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--border)}
+.stepper span{min-width:70px;text-align:center;font-size:13px;font-weight:900}
+select.sel,input.inp{min-height:44px;padding:8px 14px;border-radius:15px;border:2px solid var(--border);background:var(--surface-2);font-size:13px;font-weight:800;color:var(--ink);width:100%}
+input.inp:focus,select.sel:focus{border-color:var(--cyan);background:var(--paper);outline:0}
+
+.bill{overflow:hidden}
+.bill-h{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:18px 20px;color:#fff}
+.bill-h.e{background:linear-gradient(135deg,#0EA5E9,#2563EB)}
+.bill-h.gas{background:linear-gradient(135deg,#F97316,#E11D48)}
+.bill-h .ic{width:44px;height:44px;border-radius:15px;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.35);display:grid;place-items:center}
+.bill-h b{display:block;font-size:15.5px;font-weight:900}
+.bill-h small{font-size:11.5px;opacity:.9;font-weight:600}
+.bill-h .amt{margin-inline-start:auto;text-align:left}
+.bill-h .amt b{font-size:25px;font-weight:900}
+.bill-b{padding:18px 20px}
+.bill-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;font-size:13px;font-weight:700;color:var(--ink2);border-bottom:1px dashed var(--border)}
+.bill-row:last-of-type{border-bottom:0}
+.bill-row b{color:var(--ink);font-weight:900}
+.target-bar{position:relative;height:12px;margin:36px 0 18px;border-radius:99px;background:linear-gradient(90deg,var(--emerald),var(--amber),var(--coral))}
+.target-bar .mk{position:absolute;top:-6px;width:6px;height:24px;border-radius:99px;background:var(--ink);border:2px solid var(--paper);transition:right .35s var(--bounce)}
+.target-bar .mk span{position:absolute;right:50%;bottom:28px;transform:translateX(50%);padding:3px 9px;border-radius:10px;background:var(--ink);color:var(--paper);font-size:11px;font-weight:800;white-space:nowrap}
+.target-bar .mk.ideal{background:var(--emerald)}
+.target-bar .mk.ideal span{top:28px;bottom:auto;background:var(--emerald);color:#fff}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.cmp div{padding:13px;border-radius:16px;background:var(--surface-2);border:2px solid var(--border)}
+.cmp div.bad{background:var(--coral-soft);border-color:rgba(244,63,94,.35)}
+.cmp div.good{background:var(--emerald-soft);border-color:rgba(16,185,129,.35)}
+.cmp small{display:block;font-size:11px;font-weight:700;color:var(--mute)}
+.cmp b{font-size:18px;font-weight:900}
+
+.table-wrap{width:100%;overflow-x:auto;border-radius:18px;border:2px solid var(--border)}
+table.lt{width:100%;border-collapse:collapse;min-width:520px}
+.lt th{padding:11px 14px;background:var(--surface-2);border-bottom:2px solid var(--border);font-size:12px;font-weight:800;color:var(--mute);text-align:right;white-space:nowrap}
+.lt td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700}
+.lt tbody tr:last-child td{border-bottom:0}
+.lt tbody tr:hover{background:var(--surface-2)}
+.lt tr.me{background:var(--emerald-soft)}
+html[data-theme="dark"] .lt tr.me{background:rgba(16,185,129,.16)}
+.lt .who{display:flex;align-items:center;gap:10px}
+.lt .who .avatar{width:34px;height:34px;border-radius:11px;font-size:13px}
+.rk{display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:var(--surface-2);border:2px solid var(--border);font-size:12.5px;font-weight:900}
+.trend{font-size:12.5px;font-weight:900}
+.trend.u{color:var(--emerald-ink)}
+.trend.d{color:var(--coral-ink)}
+
+/* 4. Missions & Custom Form */
+.mission-form{display:grid;grid-template-columns:1.8fr 1fr 1fr auto;gap:10px;padding:14px;margin-bottom:18px;border-radius:20px;background:var(--violet-soft);border:2px dashed rgba(139,92,246,.45);align-items:end}
+.rec{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:14px;
+  padding:15px;margin-bottom:12px;border-radius:20px;background:var(--surface-2);border:2px solid var(--border);
+  transition:transform .18s var(--bounce),border-color .18s,background .18s;
+}
+.rec:last-child{margin-bottom:0}
+.rec:hover{transform:translateY(-2px);border-color:var(--violet)}
+.rec.done{background:var(--emerald-soft);border-color:rgba(16,185,129,.45)}
+.rec .ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;color:#fff}
+.rec b{font-size:14px;font-weight:900}
+.rec p{margin-top:3px;font-size:12px;font-weight:600;color:var(--mute);line-height:1.65}
+.rec .sv{text-align:center;min-width:94px;padding:7px 10px;border-radius:14px;background:var(--paper);border:2px solid var(--border)}
+.rec .sv b{display:block;font-size:14.5px;color:var(--emerald-ink)}
+.rec .sv small{font-size:10px;font-weight:700;color:var(--mute)}
+.eff{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:7px}
+.eff i{width:14px;height:5px;border-radius:99px;background:var(--surface-3)}
+.eff i.f{background:var(--amber)}
+.chk{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;background:var(--paper);border:2px solid var(--border-strong);color:var(--mute);box-shadow:0 4px 0 var(--border-strong);transition:all .16s var(--bounce)}
+.chk:hover{border-color:var(--emerald);color:var(--emerald);transform:scale(1.06)}
+.chk:active{transform:translateY(3px);box-shadow:0 1px 0 var(--border-strong)}
+.rec.done .chk{background:var(--emerald);border-color:var(--emerald);color:#fff;box-shadow:0 4px 0 var(--emerald-d)}
+
+/* Gradient Feature Boxes */
+.sum-box,.result,.wallet{position:relative;padding:24px;border-radius:26px;color:#fff;overflow:hidden;border:2px solid rgba(255,255,255,.22)}
+.sum-box{position:sticky;top:20px;background:linear-gradient(145deg,#4F46E5,#7C3AED 60%,#9333EA);box-shadow:0 16px 34px -8px rgba(124,58,237,.4)}
+.sum-box .big{font-size:36px;font-weight:900;color:#FEF08A;line-height:1.25;margin:6px 0}
+.result{background:linear-gradient(145deg,#0F172A,#1E293B 55%,#065F46);box-shadow:0 16px 34px -8px rgba(16,185,129,.35)}
+.result .save{font-size:38px;font-weight:900;color:#34D399;line-height:1.2;margin:6px 0}
+.result .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.result .row2 div{padding:12px;border-radius:16px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.18);text-align:center}
+.result .row2 b{display:block;font-size:18px;font-weight:900;color:#FEF08A}
+.result .row2 small{font-size:10.5px;color:#CBD5E1;font-weight:600}
+.cmpbar{margin-top:12px}
+.cmpbar .l{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#E2E8F0;margin-bottom:5px}
+.cmpbar .b{height:10px;margin-bottom:12px;border-radius:99px;background:rgba(255,255,255,.16);overflow:hidden}
+.cmpbar .b i{display:block;height:100%;border-radius:99px;transition:width .35s var(--ease)}
+.wallet{background:linear-gradient(135deg,#059669,#0D9488 55%,#0284C7);box-shadow:0 16px 34px -8px rgba(13,148,136,.4)}
+.wallet .pts{font-size:44px;font-weight:900;color:#FEF08A;line-height:1.2;margin:6px 0}
+
+/* 5. Simulator */
+.sim{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:start}
+.slider{padding:14px 16px;margin-bottom:10px;border-radius:18px;background:var(--surface-2);border:2px solid var(--border)}
+.slider .h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.slider .h .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;flex:none}
+.slider .h b{flex:1;font-size:13px;font-weight:800}
+.slider .h output{padding:3px 11px;border-radius:11px;background:var(--paper);border:2px solid var(--border);color:var(--emerald-ink);font-size:12.5px;font-weight:900}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:99px;background:linear-gradient(to left,var(--emerald) var(--p,50%),var(--surface-3) var(--p,50%));cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:4px solid var(--emerald);box-shadow:0 3px 10px rgba(16,185,129,.4);cursor:grab}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid var(--emerald);cursor:grab}
+.toggle{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:9px;border-radius:16px;background:var(--surface-2);border:2px solid var(--border)}
+.sw{position:relative;flex:none;width:52px;height:28px;border-radius:99px;background:var(--surface-3);border:2px solid var(--border-strong);transition:background .2s}
+.sw::after{content:"";position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.22);transition:right .22s var(--bounce)}
+.sw.on{background:var(--emerald);border-color:var(--emerald-d)}
+.sw.on::after{right:26px}
+
+/* 6. Garden */
+.garden-wrap{position:relative;min-height:460px;border-radius:28px;border:3px solid var(--border);overflow:hidden;box-shadow:var(--shadow);background:#0F172A}
+#garden{display:block;width:100%;height:460px}
+.g-hud{position:absolute;top:16px;right:16px;left:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none}
+.g-hud .glass{pointer-events:auto;padding:11px 16px;border-radius:18px;background:rgba(15,23,42,.74);backdrop-filter:blur(12px);border:2px solid rgba(255,255,255,.22);color:#fff}
+.g-hud .glass b{display:block;font-size:26px;font-weight:900;color:#4ADE80;line-height:1.2}
+.g-hud .glass small{font-size:11px;font-weight:700;color:#E2E8F0}
+.g-ctrl{position:absolute;bottom:16px;right:16px;left:16px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:12px 18px;border-radius:18px;background:rgba(15,23,42,.84);backdrop-filter:blur(12px);border:2px solid rgba(255,255,255,.22);color:#fff}
+.g-ctrl label{font-size:12.5px;font-weight:800;white-space:nowrap}
+.g-ctrl input{flex:1;min-width:140px}
+.plant{transition:transform .7s var(--bounce),opacity .45s}
+.sway{animation:sway 6s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
+@keyframes sway{50%{transform:rotate(2deg)}}
+.float{animation:float-y 7s ease-in-out infinite}
+@keyframes float-y{50%{transform:translateY(-6px)}}
+.milestones{display:grid;grid-template-columns:repeat(5,1fr);margin-top:8px}
+.ms{position:relative;padding-top:44px;text-align:center}
+.ms .d{position:absolute;top:4px;right:50%;transform:translateX(50%);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);border:3px solid var(--border);z-index:2;color:var(--mute)}
+.ms.ok .d{background:linear-gradient(135deg,var(--emerald),var(--cyan));border-color:#fff;color:#fff}
+.ms::before{content:"";position:absolute;top:20px;right:0;left:0;height:4px;background:var(--border)}
+.ms.ok::before{background:linear-gradient(90deg,var(--emerald),var(--cyan))}
+.ms b{display:block;font-size:12px;font-weight:800}
+.ms small{font-size:10.5px;color:var(--mute)}
+
+/* 7. League, Challenges & Quiz */
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:14px;padding:24px 6px 4px}
+.pod{text-align:center}
+.pod .av{position:relative;width:60px;height:60px;margin:0 auto 9px;border-radius:19px;display:grid;place-items:center;font-size:21px;font-weight:900;color:#fff;border:3px solid var(--paper);box-shadow:0 8px 18px rgba(0,0,0,.15)}
+.pod .av .cr{position:absolute;top:-24px;left:50%;transform:translateX(-50%);color:#F59E0B;animation:bob 2.2s ease-in-out infinite}
+.pod .av .cr svg.icon{width:24px;height:24px}
+.pod b{display:block;font-size:13px;font-weight:900}
+.pod small{font-size:11.5px;font-weight:800;color:var(--mute)}
+.pod .st{display:grid;place-items:center;margin-top:10px;border-radius:18px 18px 8px 8px;font-size:26px;font-weight:900;color:#fff}
+.pod.p1 .st{height:136px;background:linear-gradient(180deg,#FBBF24,#D97706);box-shadow:0 5px 0 #B45309}
+.pod.p2 .st{height:102px;background:linear-gradient(180deg,#38BDF8,#0284C7);box-shadow:0 5px 0 #0369A1}
+.pod.p3 .st{height:78px;background:linear-gradient(180deg,#A78BFA,#7C3AED);box-shadow:0 5px 0 #5B21B6}
+
+.chal{margin-bottom:12px;padding:15px;border-radius:18px;background:var(--surface-2);border:2px solid var(--border)}
+.chal .vs{display:flex;align-items:center;gap:10px;margin:11px 0 10px}
+.chal .vs .bar{flex:1;height:11px;border-radius:99px;background:var(--coral-soft);overflow:hidden;border:1.5px solid var(--border)}
+.chal .vs .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--emerald),var(--cyan));transition:width .35s var(--bounce)}
+
+.quiz-card{padding:20px;border-radius:22px;background:linear-gradient(145deg,var(--violet-soft),var(--paper));border:2px solid rgba(139,92,246,.4)}
+.quiz-q{font-size:15.5px;font-weight:900;margin:12px 0 14px;line-height:1.55}
+.quiz-opts{display:grid;gap:9px}
+.q-opt{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;border-radius:15px;background:var(--paper);border:2px solid var(--border);font-size:13px;font-weight:800;text-align:right;box-shadow:0 3px 0 var(--border);transition:all .15s var(--bounce)}
+.q-opt:hover:not(:disabled){border-color:var(--violet);transform:translateY(-2px)}
+.q-opt.ok{background:var(--emerald-soft);border-color:var(--emerald);color:var(--emerald-ink);box-shadow:0 3px 0 var(--emerald-d)}
+.q-opt.no{background:var(--coral-soft);border-color:var(--coral);color:var(--coral-ink);box-shadow:0 3px 0 var(--coral-d)}
+.quiz-exp{margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--cyan-soft);border:1.5px solid rgba(6,182,212,.4);font-size:12.5px;font-weight:700}
+
+.ach{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.badge{padding:13px 6px;border-radius:18px;background:var(--surface-2);border:2px solid var(--border);text-align:center;transition:transform .2s var(--bounce),border-color .2s}
+.badge:hover{transform:translateY(-3px);border-color:var(--amber)}
+.badge .bi{position:relative;width:52px;height:52px;margin:0 auto 8px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--amber) var(--v,100%),var(--surface-3) 0);color:var(--amber-ink)}
+.badge .bi::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--paper)}
+.badge .bi span{position:relative;z-index:1;display:grid;place-items:center}
+.badge.lock .bi{background:conic-gradient(var(--violet) var(--v,0%),var(--surface-3) 0);color:var(--mute)}
+.badge b{display:block;font-size:11.5px;font-weight:800}
+.badge small{font-size:10px;font-weight:700;color:var(--mute)}
+
+/* 8. Rewards & Wheel */
+.coupon{display:flex;border-radius:20px;background:var(--surface-2);border:2px solid var(--border);overflow:hidden;transition:transform .2s var(--bounce)}
+.coupon:hover{transform:translateY(-3px);border-color:var(--emerald)}
+.coupon .l{width:92px;flex:none;padding:12px 6px;display:grid;place-items:center;text-align:center;background:linear-gradient(160deg,var(--violet),var(--cyan));color:#fff;border-inline-end:3px dashed var(--paper)}
+.coupon .l b{font-size:22px;font-weight:900;line-height:1.1}
+.coupon .l small{font-size:10.5px;font-weight:700}
+.coupon .r{display:flex;flex-direction:column;flex:1;padding:13px;gap:4px}
+.coupon .r b{font-size:13px;font-weight:900}
+.coupon .r small{font-size:11px;font-weight:600;color:var(--mute)}
+.coupon .r .ft{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:8px}
+.coupon.used .l{background:linear-gradient(160deg,#10B981,#059669)}
+
+.draw{text-align:center}
+.countdown{display:flex;justify-content:center;gap:8px;margin:8px 0 14px}
+.countdown div{min-width:54px;padding:7px;border-radius:14px;background:var(--surface-2);border:2px solid var(--border)}
+.countdown b{display:block;font-size:19px;font-weight:900;color:var(--violet-ink);line-height:1.25}
+.countdown small{font-size:10px;font-weight:700;color:var(--mute)}
+.wheel-wrap{position:relative;width:min(256px,100%);aspect-ratio:1;margin:8px auto 18px}
+.wheel-wrap svg{width:100%;height:100%;transition:transform 5s cubic-bezier(.12,.82,.12,1);filter:drop-shadow(0 10px 20px rgba(15,23,42,.2))}
+.wheel-wrap .pin{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-inline:12px solid transparent;border-top:22px solid var(--coral);z-index:3}
+.wheel-wrap .hub{position:absolute;inset:0;margin:auto;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:#0F172A;color:#FEF08A;border:4px solid #fff;font-size:11.5px;font-weight:900}
+
+/* Floating XP, Toast, Confetti & Mobile Dock */
+.float-xp{position:fixed;pointer-events:none;z-index:200;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#1E1B4B;font-size:14px;font-weight:900;box-shadow:0 6px 16px rgba(245,158,11,.45);animation:xp-fly 1.15s var(--ease) forwards}
+@keyframes xp-fly{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}20%{opacity:1;transform:translate(-50%,-10px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-75px) scale(.95)}}
+
+.toast{position:fixed;bottom:24px;left:50%;display:flex;align-items:center;gap:10px;width:max-content;max-width:calc(100vw - 28px);padding:12px 18px;border-radius:18px;background:#0F172A;color:#fff;border:2px solid var(--emerald);box-shadow:var(--shadow-float);font-size:13px;font-weight:800;pointer-events:none;transform:translate(-50%,140px);transition:transform .26s var(--bounce);z-index:150}
+.toast.on{transform:translate(-50%,0)}
+.toast i{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:var(--emerald);color:#fff;font-style:normal}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:160}
+.mobnav{display:none}
+
+@media(max-width:1180px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .col21,.col12,.sh-monitor{grid-template-columns:1fr!important}
+  .sim{grid-template-columns:1fr}
+  .mission-form{grid-template-columns:1fr 1fr}
+}
+@media(max-width:1020px){
+  .hero{grid-template-columns:1fr}
+  .col2{grid-template-columns:1fr!important}
+}
+@media(max-width:860px){
+  .app{padding-inline-start:0}
+  .side{display:none}
+  .main{padding:14px 12px calc(102px + env(safe-area-inset-bottom))}
+  .top-actions{width:100%}
+  .search-wrap{flex:1 1 100%;width:100%}
+  .search-results{width:100%;min-width:0}
+  .sum-box{position:relative;top:auto}
+  .rec{grid-template-columns:auto minmax(0,1fr) auto;gap:10px}
+  .rec .sv{grid-column:2;text-align:right}
+  .ach{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .milestones{display:flex;overflow-x:auto;padding-bottom:8px}
+  .ms{flex:1 0 96px}
+  .toast{bottom:86px}
+  .mobnav{
+    position:fixed;bottom:10px;right:10px;left:10px;display:flex;overflow-x:auto;gap:4px;padding:6px;
+    border-radius:20px;background:rgba(15,23,42,.95);backdrop-filter:blur(14px);
+    border:2px solid rgba(255,255,255,.16);box-shadow:0 14px 32px rgba(0,0,0,.4);z-index:70;scrollbar-width:none;
+  }
+  .mobnav::-webkit-scrollbar{display:none}
+  .mobnav button{flex:1 0 64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:52px;border-radius:14px;color:#94A3B8;transition:all .18s var(--bounce)}
+  .mobnav button svg.icon{width:19px;height:19px}
+  .mobnav button span{font-size:9.5px;font-weight:800;white-space:nowrap}
+  .mobnav button.on{background:linear-gradient(135deg,var(--emerald),var(--cyan));color:#fff;transform:translateY(-2px)}
+}
+@media(max-width:520px){
+  .kpis{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{padding:13px}
+  .kpi .k-v{font-size:21px}
+  .hero{padding:18px}
+  .speech::before{display:none}
+  .mission-form{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ==================== SIDEBAR ==================== -->
+<aside class="side">
+  <div class="brand">
+    <div class="logo-badge" onclick="mascotCheer(this)" title="ماموریت انرژی · روی لوگو کلیک کن!">
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M22 4 8 22h11l-2 14 15-18H21l1-14z" fill="#FEF08A" stroke="#064E3B" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M28 8c5 0 8 3 8 8-5 0-8-3-8-8z" fill="#4ADE80" stroke="#064E3B" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <b>ماموریت انرژی</b>
+      <small>مدیریت بازی‌وار انرژی خانه</small>
+    </div>
+  </div>
+
+  <nav class="nav" id="nav" aria-label="منوی اصلی">
+    <div class="nav-l">مرکز فرماندهی</div>
+    <button data-v="dash" class="on"><span class="nav-ic" style="background:linear-gradient(135deg,#10B981,#06B6D4)"><i data-i="grid"></i></span>داشبورد انرژی</button>
+    <button data-v="smarthome"><span class="nav-ic" style="background:linear-gradient(135deg,#06B6D4,#2563EB)"><i data-i="home"></i></span>خانهٔ هوشمند<span class="pill v">زنده</span></button>
+    <button data-v="bills"><span class="nav-ic" style="background:linear-gradient(135deg,#3B82F6,#6366F1)"><i data-i="bill"></i></span>قبض هوشمند</button>
+
+    <div class="nav-l">ماموریت و آزمایشگاه</div>
+    <button data-v="recs"><span class="nav-ic" style="background:linear-gradient(135deg,#F59E0B,#F97316)"><i data-i="bulb"></i></span>ماموریت‌ها<span class="pill" id="recBadge">۵</span></button>
+    <button data-v="sim"><span class="nav-ic" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)"><i data-i="sliders"></i></span>شبیه‌ساز قبض</button>
+
+    <div class="nav-l">خانواده و جایزه</div>
+    <button data-v="garden"><span class="nav-ic" style="background:linear-gradient(135deg,#22C55E,#15803D)"><i data-i="leaf"></i></span>باغ خانواده</button>
+    <button data-v="league"><span class="nav-ic" style="background:linear-gradient(135deg,#EAB308,#EA580C)"><i data-i="trophy"></i></span>لیگ و چالش‌ها</button>
+    <button data-v="rewards"><span class="nav-ic" style="background:linear-gradient(135deg,#F43F5E,#DB2777)"><i data-i="gift"></i></span>جوایز و گردونه</button>
+  </nav>
+
+  <div class="side-foot">
+    <div class="row">
+      <div class="avatar">م</div>
+      <div>
+        <b>خانوادهٔ محمدی</b>
+        <small id="sideLevelLbl">سطح ۷ · نگهبان سبز</small>
+      </div>
+    </div>
+    <div class="xp-bar"><i id="sideXpBar"></i></div>
+    <div class="meta">
+      <span class="num" id="sidePts">۲٬۷۲۰ امتیاز</span>
+      <span class="num" id="sideNextLvl">تا سطح ۸: ۲۸۰</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ==================== MAIN ==================== -->
+<main class="main">
+  <header class="top">
+    <div class="top-heading">
+      <h1 id="title" tabindex="-1">داشبورد انرژی</h1>
+      <p id="subtitle">گزارش خانوار محمدی · مصرف این ماه ۱۴٪ کمتر از ماه قبل است.</p>
+    </div>
+
+    <div class="top-actions">
+      <button type="button" class="stat-pill streak" id="streakBtn" onclick="claimStreak(this)" title="استریک روزانه مصرف بهینه">
+        <i data-i="flame"></i><span class="num" id="streakNum">۱۲ روز</span>
+      </button>
+
+      <button type="button" class="stat-pill points" id="pointsPill" onclick="go('rewards')" title="کیف امتیاز و جوایز">
+        <i data-i="bolt"></i><span class="num" id="hdrPts">۲٬۷۲۰</span>
+      </button>
+
+      <div class="search-wrap" role="search">
+        <label class="search">
+          <i data-i="search"></i>
+          <input id="globalSearch" type="search" placeholder="جستجو در بخش‌ها، وسایل، ماموریت…" aria-label="جستجو" autocomplete="off">
+        </label>
+        <div class="search-results" id="searchResults" hidden></div>
+      </div>
+
+      <button class="ibtn" id="soundToggle" type="button" onclick="toggleSound()" title="قطع/وصل افکت صوتی" aria-label="قطع یا وصل افکت صوتی"><i data-i="volOn"></i></button>
+      <button class="ibtn" id="themeToggle" type="button" title="تغییر تم روشن و تیره" aria-label="تغییر تم"><i data-i="moon"></i></button>
+
+      <div class="ibtn-wrap">
+        <button class="ibtn" id="notifBtn" type="button" onclick="toggleNotifs()" title="مرکز اعلان‌ها" aria-label="مرکز اعلان‌ها">
+          <i data-i="bell"></i><span class="dot" id="notifDot"></span>
+        </button>
+        <div class="notif-pop" id="notifPop" hidden>
+          <div class="notif-h">
+            <b><i data-i="bell"></i>مرکز اعلان‌ها</b>
+            <button type="button" class="btn g sm" onclick="markAllNotifsRead()">خوانده شد</button>
+          </div>
+          <div id="notifList"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 1. DASHBOARD ==================== -->
+  <section class="view on" id="v-dash">
+    <div class="grid">
+      <div class="hero">
+        <div class="hero-left">
+          <span class="eyebrow"><span class="pulse"></span>گزارش ماهانه · آبان ۱۴۰۵ · جزو ۱۰٪ برتر تهران</span>
+          <div class="mascot-row">
+            <div class="mascot-wrap" onclick="mascotCheer(this)" title="روی برقی کلیک کن تا نکتهٔ جدید بگه!">
+              <svg class="mascot-svg" viewBox="0 0 100 100" aria-label="کاراکتر برقی">
+                <defs>
+                  <linearGradient id="mBody" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#FEF08A"/><stop offset="55%" stop-color="#34D399"/><stop offset="100%" stop-color="#06B6D4"/>
+                  </linearGradient>
+                </defs>
+                <path d="M50 18 C50 6, 68 4, 72 16 C64 22, 54 22, 50 18Z" fill="#4ADE80" stroke="#065F46" stroke-width="2.5"/>
+                <path d="M50 18 L50 26" stroke="#065F46" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="50" cy="56" r="36" fill="rgba(254,240,138,.22)"/>
+                <path d="M24 44 C24 27, 76 27, 76 44 C78 65, 72 82, 50 85 C28 82, 22 65, 24 44Z" fill="url(#mBody)" stroke="#0F172A" stroke-width="3"/>
+                <ellipse cx="33" cy="60" rx="5" ry="3" fill="#FB7185" opacity=".75"/>
+                <ellipse cx="67" cy="60" rx="5" ry="3" fill="#FB7185" opacity=".75"/>
+                <g class="mascot-eye">
+                  <circle cx="38" cy="51" r="5.5" fill="#0F172A"/><circle cx="36.5" cy="49" r="2" fill="#fff"/>
+                  <circle cx="62" cy="51" r="5.5" fill="#0F172A"/><circle cx="60.5" cy="49" r="2" fill="#fff"/>
+                </g>
+                <path d="M42 61 Q50 70 58 61" fill="none" stroke="#0F172A" stroke-width="3.2" stroke-linecap="round"/>
+                <path d="M52 69 L45 77 H50 L48 83 L55 75 H50 Z" fill="#F59E0B" stroke="#0F172A" stroke-width="1.2" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="speech" id="mascotSpeech">
+              سلام قهرمان‌ها! من <b>برقی</b> هستم. این ماه عالی بودید؛ روی من کلیک کن تا نکتهٔ مخفی صرفه‌جویی بهت بگم!
+            </div>
+          </div>
+
+          <h2 id="heroHeadline">این ماه <em id="heroSave">۴۸۷٬۰۰۰ تومان</em><br>کمتر از آبان پارسال پرداخت می‌کنید!</h2>
+
+          <div class="hero-stats">
+            <div class="hero-chip"><i data-i="bolt"></i><div><b class="num" data-count="312">۰</b><small>کیلووات‌ساعت برق</small></div></div>
+            <div class="hero-chip"><i data-i="flame"></i><div><b class="num" data-count="186">۰</b><small>مترمکعب گاز</small></div></div>
+            <div class="hero-chip"><i data-i="leaf"></i><div><b class="num" data-count="94">۰</b><small>کیلوگرم CO₂ کمتر</small></div></div>
+          </div>
+
+          <div class="hero-cta">
+            <button class="btn l" onclick="go('smarthome')"><i data-i="home"></i>کنترل خانهٔ هوشمند</button>
+            <button class="btn glass-btn" onclick="go('league')"><i data-i="brain"></i>مسابقهٔ کوییز انرژی</button>
+          </div>
+        </div>
+
+        <div class="score">
+          <svg class="ring" viewBox="0 0 220 220" id="ring"></svg>
+          <div class="ring-c">
+            <div><small>امتیاز بهره‌وری</small><b class="num" data-count="82">۰</b><span class="grade">رتبهٔ A</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="grid col21" style="grid-template-columns:1.65fr 1fr">
+        <div class="panel">
+          <div class="ph">
+            <div><h3><i data-i="rank"></i>روند مصرف ۱۲ ماه اخیر</h3><small>مقایسهٔ ماهانه با سال گذشته و خط هدف ایده‌آل</small></div>
+            <div class="seg" id="segRes"><button class="on" data-k="e">برق</button><button data-k="g">گاز</button></div>
+          </div>
+          <div class="legend">
+            <span><i style="background:var(--emerald)"></i>مصرف امسال</span>
+            <span><i style="background:var(--chart-prev)"></i>سال گذشته</span>
+            <span><i style="background:var(--amber);height:4px"></i>هدف ایده‌آل</span>
+          </div>
+          <div class="chart" id="mainChart"></div>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="plug"></i>سهم وسایل از مصرف</h3><small>روی هر بخش برو تا درصد دقیقش نمایش داده شود</small></div></div>
+          <div class="chart" id="donut" style="max-width:220px;margin:0 auto"></div>
+          <div class="rows" id="appl" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <div class="grid col12" style="grid-template-columns:1fr 1.35fr">
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="users"></i>اعضای تیم خانواده</h3><small>اعضا رو تشویق کن تا انگیزه و امتیاز (+۱۰) بگیرن!</small></div></div>
+          <div class="rows" id="members"></div>
+        </div>
+
+        <div class="panel">
+          <div class="ph">
+            <div><h3><i data-i="clock"></i>الگوی مصرف ساعتی امروز</h3><small>ساعات پیک (۱۹ تا ۲۳) تعرفهٔ بالاتری دارند</small></div>
+            <span class="tag up">پیک فعال</span>
+          </div>
+          <div class="chart" id="hourly"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 2. SMART HOME ==================== -->
+  <section class="view" id="v-smarthome">
+    <div class="grid">
+      <div class="sh-monitor">
+        <div>
+          <span class="tag cyan" style="margin-bottom:8px">مانیتور زندهٔ مصرف لحظه‌ای</span>
+          <div style="font-size:13px;color:#CBD5E1;font-weight:700">توان لحظه‌ای کل خانه</div>
+          <div class="sh-watts num"><span id="shTotalW">۰</span> <small style="font-size:18px;color:#94A3B8">وات</small></div>
+          <div class="sh-gauge"><i id="shGaugeBar" style="width:40%;background:#10B981"></i></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <span id="shLoadBadge" class="tag dn">عالی</span>
+            <small style="color:#E2E8F0;font-weight:700">هزینهٔ تخمینی: <b class="num" id="shHourCost" style="color:#FEF08A">۰</b> تومان/ساعت</small>
+          </div>
+        </div>
+
+        <div style="display:grid;gap:10px">
+          <div style="font-size:12.5px;color:#CBD5E1;font-weight:700">هدف چالش لحظه‌ای: اگر بار خانه را زیر <b>۸۰۰ وات</b> بیاوری <b style="color:#FEF08A">+۱۲۰ امتیاز</b> جایزه می‌گیری!</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px">
+            <button class="btn p" onclick="shEcoSleep(this)"><i data-i="moon"></i>حالت خواب اکو</button>
+            <button class="btn glass-btn" onclick="shTurnAllEco(this)"><i data-i="leaf"></i>حالت اکو برای همه</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph">
+          <div><h3><i data-i="home"></i>کنترل هوشمند اتاق‌ها و وسایل</h3><small>هر وسیله را روشن/خاموش کن یا حالت اکو (کاهش ۳۵٪ مصرف) را فعال کن</small></div>
+          <span class="tag n num" id="shOnCount">۰ وسیله روشن</span>
+        </div>
+        <div class="filters" id="shRoomFilters"></div>
+        <div class="sh-grid" id="shGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 3. SMART BILLS ==================== -->
+  <section class="view" id="v-bills">
+    <div class="grid">
+      <div class="panel">
+        <div class="ph"><div><h3><i data-i="home"></i>مشخصات خانوار</h3><small>هدف ایده‌آل مصرف بر اساس تعداد اعضا، متراژ و اقلیم محاسبه می‌شود</small></div></div>
+        <div class="profile">
+          <div class="field">
+            <label>تعداد اعضا</label>
+            <div class="stepper"><button type="button" onclick="prof('n',-1)" aria-label="کاهش تعداد اعضا">−</button><span id="pN" class="num">۴ نفر</span><button type="button" onclick="prof('n',1)" aria-label="افزایش تعداد اعضا">+</button></div>
+          </div>
+          <div class="field">
+            <label>متراژ خانه</label>
+            <div class="stepper"><button type="button" onclick="prof('a',-10)" aria-label="کاهش متراژ">−</button><span id="pA" class="num">۱۱۰ متر</span><button type="button" onclick="prof('a',10)" aria-label="افزایش متراژ">+</button></div>
+          </div>
+          <div class="field">
+            <label for="pC">اقلیم</label>
+            <select class="sel" id="pC" onchange="renderBills()">
+              <option value="1">معتدل (تهران)</option>
+              <option value="1.25">سرد (تبریز)</option>
+              <option value="0.85">گرم (اهواز)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>دورهٔ قبض</label>
+            <div class="seg" id="segBill"><button class="on" data-k="0">آبان</button><button data-k="1">مهر</button><button data-k="2">شهریور</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid col2" style="grid-template-columns:1fr 1fr" id="billCards"></div>
+
+      <div class="panel">
+        <div class="ph"><div><h3><i data-i="bill"></i>تاریخچهٔ قبوض ۶ ماه اخیر</h3><small>مبالغ به تومان</small></div></div>
+        <div class="table-wrap"><table class="lt" id="billTable"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 4. MISSIONS ==================== -->
+  <section class="view" id="v-recs">
+    <div class="grid col21" style="grid-template-columns:1.75fr 1fr;align-items:start">
+      <div class="panel">
+        <div class="ph"><div><h3><i data-i="bulb"></i>ماموریت‌های انرژی خانواده</h3><small>هر ماموریت را کامل کن تا +۱۵۰ امتیاز و کنفتی بگیری!</small></div></div>
+
+        <form class="mission-form" onsubmit="event.preventDefault();addCustomMission()">
+          <div class="field"><label for="cmTitle">ساخت ماموریت خانوادگی جدید</label><input class="inp" id="cmTitle" type="text" placeholder="مثلاً: خاموش کردن چراغ اتاق قبل از خروج" required></div>
+          <div class="field"><label for="cmCat">دسته</label><select class="sel" id="cmCat"><option value="b">عادت‌ها</option><option value="h">گرمایش/سرمایش</option><option value="a">وسایل برقی</option><option value="l">روشنایی</option></select></div>
+          <div class="field"><label for="cmPts">پاداش امتیاز</label><select class="sel" id="cmPts"><option value="100">۱۰۰ امتیاز</option><option value="150" selected>۱۵۰ امتیاز</option><option value="200">۲۰۰ امتیاز</option></select></div>
+          <button class="btn v" type="submit"><i data-i="plus"></i>افزودن</button>
+        </form>
+
+        <div class="filters" id="recF"></div>
+        <div id="recList"></div>
+      </div>
+
+      <div class="sum-box">
+        <span class="tag amber" style="margin-bottom:8px">پاداش ماموریت‌ها</span>
+        <small style="display:block;color:#E0E7FF;font-weight:700">صرفه‌جویی سالانه با ماموریت‌های انجام‌شده</small>
+        <div class="big num" id="recSum">۰</div>
+        <small style="color:#E0E7FF;font-weight:700">تومان در سال</small>
+
+        <div class="cmpbar" style="margin-top:18px">
+          <div class="l"><span>پیشرفت ماموریت‌ها</span><span class="num" id="recPct">۰٪</span></div>
+          <div class="b"><i id="recBar" style="background:linear-gradient(90deg,#34D399,#FEF08A);width:0"></i></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+          <div style="padding:11px;border-radius:15px;background:rgba(255,255,255,.12)">
+            <b class="num" id="recKwh" style="font-size:21px;color:#6EE7B7">۰</b>
+            <small style="display:block;color:#E0E7FF;font-size:10.5px">kWh صرفه‌جویی ماهانه</small>
+          </div>
+          <div style="padding:11px;border-radius:15px;background:rgba(255,255,255,.12)">
+            <b class="num" id="recCo2" style="font-size:21px;color:#FEF08A">۰</b>
+            <small style="display:block;color:#E0E7FF;font-size:10.5px">kg CO₂ کمتر</small>
+          </div>
+        </div>
+
+        <button class="btn l" style="margin-top:18px;width:100%" onclick="simFromRecs();go('sim')">اعمال در شبیه‌ساز قبض ←</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 5. SIMULATOR ==================== -->
+  <section class="view" id="v-sim">
+    <div class="sim">
+      <div class="panel">
+        <div class="ph">
+          <div><h3><i data-i="sliders"></i>آزمایشگاه شبیه‌ساز قبض</h3><small>عادت‌های مصرف را تغییر بده و نتیجه را زنده ببین</small></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn v sm" onclick="simFromRecs();renderSimUI();simUpdate()">اعمال از ماموریت‌ها</button>
+            <button class="btn g sm" onclick="simReset()">بازنشانی</button>
+          </div>
+        </div>
+        <div id="sliders"></div>
+        <div id="toggles" style="margin-top:10px"></div>
+      </div>
+
+      <div class="grid" style="align-content:start">
+        <div class="result">
+          <span class="tag dn" style="margin-bottom:8px">محاسبهٔ زنده</span>
+          <div style="color:#CBD5E1;font-size:12.5px;font-weight:700">کاهش تخمینی قبض ماه آینده</div>
+          <div class="save num" id="sSave">۰</div>
+          <div style="color:#CBD5E1;font-size:13px;font-weight:700">تومان · معادل <b id="sPct" style="color:#FEF08A">۰٪</b> صرفه‌جویی</div>
+
+          <div class="row2">
+            <div><b class="num" id="sYear">۰</b><small>صرفه‌جویی سالانه (تومان)</small></div>
+            <div><b class="num" id="sScore">۰</b><small>امتیاز لیگ اضافه</small></div>
+          </div>
+
+          <div class="cmpbar">
+            <div class="l"><span>قبض فعلی</span><span class="num" id="sNow">۰</span></div>
+            <div class="b"><i id="bNow" style="background:#64748B;width:100%"></i></div>
+            <div class="l"><span>قبض پیش‌بینی‌شده</span><span class="num" id="sNew">۰</span></div>
+            <div class="b"><i id="bNew" style="background:linear-gradient(90deg,#10B981,#34D399,#FEF08A)"></i></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="rank"></i>پیش‌بینی ۶ ماه آینده</h3><small>مقایسهٔ هزینه با و بدون تغییر عادت‌ها</small></div></div>
+          <div class="chart" id="simChart"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 6. GARDEN ==================== -->
+  <section class="view" id="v-garden">
+    <div class="grid">
+      <div class="garden-wrap">
+        <svg id="garden" viewBox="0 0 1000 460" preserveAspectRatio="xMidYMid slice"></svg>
+        <div class="g-hud">
+          <div class="glass"><small>سرسبزی باغ شما</small><b class="num" id="gPct">۷۲٪</b><small id="gStage">باغ شکوفا</small></div>
+          <div class="glass" style="text-align:left"><small>درختان کاشته‌شده</small><b class="num" id="gTrees">۱۲</b><small>هر ۵۰ kWh صرفه‌جویی = ۱ درخت</small></div>
+        </div>
+        <div class="g-ctrl">
+          <label for="gRange">بهره‌وری انرژی:</label>
+          <input type="range" id="gRange" min="0" max="100" value="72">
+          <b class="num" id="gVal" style="min-width:34px;text-align:center;font-size:17px;color:#FEF08A">۷۲</b>
+          <button class="btn c sm" onclick="waterGarden(this)"><i data-i="drop"></i>آبیاری باغ (+۵٪)</button>
+          <button class="btn l sm" onclick="plantNewTree(this)"><i data-i="leaf"></i>کاشت نهال (۱۰۰ امتیاز)</button>
+        </div>
+      </div>
+
+      <div class="grid col2" style="grid-template-columns:1.4fr 1fr">
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="leaf"></i>مسیر رشد باغ</h3><small>۵ مرحلهٔ سبز شدن باغ خانواده</small></div></div>
+          <div class="milestones" id="miles"></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="users"></i>سهم اعضای خانواده</h3><small>گیاهانی که هر عضو کاشته</small></div></div>
+          <div class="rows" id="gMembers"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 7. LEAGUE, CHALLENGES & QUIZ ==================== -->
+  <section class="view" id="v-league">
+    <div class="grid col21" style="grid-template-columns:1.5fr 1fr;align-items:start">
+      <div class="grid">
+        <div class="panel">
+          <div class="ph">
+            <div><h3><i data-i="trophy"></i>لیگ خانواده‌های سبز · فصل پاییز</h3><small>محله: یوسف‌آباد · امتیاز شما زنده در جدول به‌روز می‌شود</small></div>
+            <div class="seg" id="segLeague"><button class="on" data-k="n">محله</button><button data-k="c">شهر</button><button data-k="f">دوستان</button></div>
+          </div>
+          <div class="podium" id="podium"></div>
+        </div>
+        <div class="panel"><div class="table-wrap"><table class="lt" id="leagueTable"></table></div></div>
+      </div>
+
+      <div class="grid">
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="brain"></i>مسابقهٔ کوییز انرژی</h3><small>به ۵ سوال پاسخ بده و برای هر جواب درست +۵۰ امتیاز بگیر!</small></div></div>
+          <div class="quiz-card" id="quizBox"></div>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="bolt"></i>رقابت‌های گروهی فعال</h3><small>مشارکت امروزت را ثبت کن تا نوار پیشرفت جلو برود</small></div></div>
+          <div id="chals"></div>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="star"></i>دستاوردها</h3><small>۶ از ۹ نشان باز شده · روی هر نشان کلیک کن</small></div></div>
+          <div class="ach" id="ach"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 8. REWARDS & LUCKY WHEEL ==================== -->
+  <section class="view" id="v-rewards">
+    <div class="grid col21" style="grid-template-columns:1.55fr 1fr;align-items:start">
+      <div class="grid">
+        <div class="wallet">
+          <span class="tag amber" style="margin-bottom:8px">کیف امتیاز سبز</span>
+          <div class="pts num" id="wPts">۲٬۷۲۰</div>
+          <small style="color:#E0F2FE;font-size:13px;font-weight:700">
+            امتیاز قابل تبدیل · معادل <b style="color:#FEF08A" id="wToman">۲۷۲٬۰۰۰</b> تومان تخفیف قبض
+          </small>
+          <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+            <button class="btn l" onclick="redeem(this)"><i data-i="wallet"></i>تبدیل به تخفیف قبض</button>
+            <button class="btn glass-btn" onclick="plantRealSapling(this)"><i data-i="leaf"></i>کاشت نهال واقعی (۵۰۰ امتیاز)</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="gift"></i>تخفیف‌های قبض و کوپن‌ها</h3><small>با امتیاز سبز خود فعال کنید</small></div></div>
+          <div class="grid col2" style="grid-template-columns:1fr 1fr;gap:14px" id="coupons"></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="draw">
+          <div class="ph" style="justify-content:center;text-align:center">
+            <div><h3><i data-i="star"></i>گردونهٔ شانس ماهانه</h3><small id="chanceSub">شما ۳ شانس در گردونهٔ آذر دارید</small></div>
+          </div>
+          <div class="countdown" id="cd"></div>
+          <div class="wheel-wrap"><div class="pin"></div><svg id="wheel" viewBox="0 0 200 200"></svg><div class="hub">بچرخان</div></div>
+          <button class="btn p" id="spinBtn" onclick="spin()" style="width:100%">چرخاندن گردونهٔ شانس (۳ شانس)</button>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div><h3><i data-i="trophy"></i>برندگان ماه گذشته</h3></div></div>
+          <div class="rows" id="winners"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+
+<nav class="mobnav" id="mobnav" aria-label="منوی موبایل"></nav>
+<div class="toast" id="toast" role="status" aria-live="polite"><i aria-hidden="true">✓</i><span></span></div>
+<canvas class="confetti" id="conf" aria-hidden="true"></canvas>
+
+<script>
+/* ==========================================================================
+   HELPERS, INLINE SVG ICON LIBRARY & WEB AUDIO SYNTH
+   ========================================================================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const fa=(n,d=0)=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:d,minimumFractionDigits:0});
+const faD=s=>String(s).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const tm=n=>fa(Math.round(n/1000)*1000);
+const NS='http://www.w3.org/2000/svg';
+const MONTHS=['آذر','دی','بهمن','اسفند','فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان'];
+const reducedMotion=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const IC={
+  grid:'<rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/>',
+  home:'<path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+  bill:'<path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h4"/>',
+  bulb:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/>',
+  sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 1 8-1.6 6-6 10-9 10z"/><path d="M2 21c0-3 1.9-5.4 5-6"/>',
+  trophy:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',
+  gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
+  bolt:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3.3.3 1.4 1.2 2.6 2.5 2.8z"/>',
+  wallet:'<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  rank:'<path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-7"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  snow:'<path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M20.9 13.4A9 9 0 0 1 10.6 3.1a9 9 0 1 0 10.3 10.3z"/>',
+  fridge:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M5 10h14M9 5v2M9 13v3"/>',
+  wash:'<rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M7 6h.01M11 6h.01"/>',
+  tv:'<rect x="2" y="7" width="20" height="13" rx="2"/><path d="m17 2-5 5-5-5"/>',
+  game:'<rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"/>',
+  pc:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  thermo:'<path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/>',
+  shower:'<path d="M4 4l2.5 2.5M13.5 6.5a4.9 4.9 0 0 0-7 0M8 4a7 7 0 0 1 12 5v13"/>',
+  plug:'<path d="M12 22v-5M9 8V2M15 8V2M18 8v5a6 6 0 0 1-12 0V8z"/>',
+  window:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  brain:'<path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-5.04Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-5.04Z"/>',
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  crown:'<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/>',
+  drop:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+  volOn:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+  volOff:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>'
+};
+const icon=(k,sw=2.1)=>`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]||''}</svg>`;
+const hydrate=()=>$$('[data-i]').forEach(e=>{e.outerHTML=icon(e.dataset.i)});
+function svgEl(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+
+/* Web Audio Sound Effects */
+let soundOn=true, audioCtx=null;
+function playSfx(type){
+  if(!soundOn)return;
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    const now=audioCtx.currentTime;
+    const tone=(freq,dur,wave='sine',gain=.08,delay=0)=>{
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type=wave; o.frequency.setValueAtTime(freq,now+delay);
+      g.gain.setValueAtTime(gain,now+delay); g.gain.exponentialRampToValueAtTime(.001,now+delay+dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(now+delay); o.stop(now+delay+dur);
+    };
+    if(type==='click') tone(520,.05,'triangle',.06);
+    else if(type==='coin'){tone(880,.09,'sine',.08,0);tone(1320,.15,'sine',.08,.06)}
+    else if(type==='win'){[523,659,784,1046].forEach((f,i)=>tone(f,.16,'triangle',.08,i*.07))}
+    else if(type==='buzz'){tone(200,.14,'sawtooth',.07,0);tone(145,.16,'sawtooth',.06,.07)}
+  }catch(e){}
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  const b=$('#soundToggle');
+  if(b) b.innerHTML=icon(soundOn?'volOn':'volOff');
+  if(soundOn) playSfx('click');
+  toast(soundOn?'افکت‌های صوتی فعال شد':'افکت‌های صوتی بی‌صدا شد');
+}
+
+/* ==========================================================================
+   SHARED GLOBAL STATE
+   ========================================================================== */
+const state={
+  pts:2720,
+  streak:12,
+  streakClaimed:false,
+  chances:3,
+  gardenEff:72,
+  extraTrees:0,
+  smartRewardClaimed:false,
+  paidBills:{'0-e':false,'0-gas':false,'1-e':true,'1-gas':true,'2-e':true,'2-gas':true},
+  notifs:[
+    {id:1,ic:'flame',bg:'#F43F5E',t:'هشدار پیک مصرف (۱۹ تا ۲۳)',s:'وسایل پرمصرف را در بخش خانهٔ هوشمند خاموش کنید!',read:false,go:'smarthome'},
+    {id:2,ic:'brain',bg:'#8B5CF6',t:'کوییز جدید انرژی آماده است',s:'در لیگ خانواده‌ها به ۵ سوال پاسخ بده و تا ۲۵۰ امتیاز بگیر!',read:false,go:'league'},
+    {id:3,ic:'gift',bg:'#10B981',t:'۳ شانس گردونهٔ آذر فعال است',s:'همین حالا گردونهٔ شانس را بچرخان و جایزه ببر!',read:false,go:'rewards'}
+  ]
+};
+
+function spawnFloatingXP(delta, anchorEl){
+  const el=document.createElement('div');
+  el.className='float-xp num';
+  el.textContent=(delta>0?'+':'')+fa(delta)+' امتیاز';
+  if(delta<0){el.style.background='linear-gradient(135deg,#F43F5E,#E11D48)';el.style.color='#fff'}
+  const r=anchorEl&&anchorEl.getBoundingClientRect?anchorEl.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2,width:0,height:0};
+  el.style.left=(r.left+r.width/2)+'px'; el.style.top=(r.top+10)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1150);
+}
+
+function addPoints(delta, anchorEl){
+  const oldLvl=Math.floor((state.pts+80)/400)+1;
+  state.pts=Math.max(0,state.pts+delta);
+  const newLvl=Math.floor((state.pts+80)/400)+1;
+  syncAllPointsUI();
+  spawnFloatingXP(delta, anchorEl||$('#pointsPill'));
+  if(delta>0) playSfx('coin');
+  if(newLvl>oldLvl){
+    playSfx('win');
+    toast('تبریک! خانوادهٔ محمدی به سطح '+fa(newLvl)+' ارتقا پیدا کرد!');
+    confetti($('#pointsPill'));
+  }
+}
+
+function syncAllPointsUI(){
+  const hdr=$('#hdrPts'), sp=$('#sidePts'), pill=$('#pointsPill');
+  if(hdr) hdr.textContent=fa(state.pts);
+  if(sp) sp.textContent=fa(state.pts)+' امتیاز';
+  if(pill){pill.classList.remove('bump');void pill.offsetWidth;pill.classList.add('bump')}
+
+  const lvl=Math.floor((state.pts+80)/400)+1;
+  const base=(lvl-1)*400-80, pct=Math.min(100,Math.max(5,Math.round(((state.pts-base)/400)*100)));
+  const remain=Math.max(0,base+400-state.pts);
+  const titles=['نوآموز سبز','دوستدار زمین','شکارچی وات','قهرمان خانه','مدافع انرژی','استاد صرفه‌جویی','نگهبان سبز','فرمانده خورشید','اسطورهٔ انرژی'];
+  if($('#sideLevelLbl')) $('#sideLevelLbl').textContent=`سطح ${fa(lvl)} · ${titles[Math.min(titles.length-1,lvl-1)]}`;
+  if($('#sideXpBar')) $('#sideXpBar').style.width=pct+'%';
+  if($('#sideNextLvl')) $('#sideNextLvl').textContent=`تا سطح ${fa(lvl+1)}: ${fa(remain)}`;
+
+  if($('#wPts')) $('#wPts').textContent=fa(state.pts);
+  if($('#wToman')) $('#wToman').textContent=fa(state.pts*100);
+  if($('.view.on')?.id==='v-league') renderLeague();
+}
+
+function toast(msg){
+  const t=$('#toast'); if(!t)return;
+  t.querySelector('span').textContent=msg;
+  t.classList.add('on');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('on'),3100);
+}
+
+function countUp(el,to,dur=550,fmt=fa){
+  if(!el)return;
+  cancelAnimationFrame(el._cf);
+  if(reducedMotion()){el.textContent=fmt(to);return}
+  const st=performance.now();
+  const f=now=>{const p=Math.min(1,(now-st)/dur),e=1-Math.pow(1-p,4);el.textContent=fmt(to*e);if(p<1)el._cf=requestAnimationFrame(f)};
+  el._cf=requestAnimationFrame(f);
+}
+
+/* Confetti */
+const cv=$('#conf'), cx=cv.getContext('2d');
+let parts=[];
+function confetti(el){
+  if(reducedMotion())return;
+  cv.width=innerWidth; cv.height=innerHeight;
+  const r=el&&el.getBoundingClientRect?el.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2,width:0,height:0};
+  const x=r.left+r.width/2, y=r.top+r.height/2;
+  const cols=['#10B981','#06B6D4','#F59E0B','#F43F5E','#8B5CF6','#FEF08A'];
+  for(let i=0;i<75;i++) parts.push({x,y,vx:(Math.random()-.5)*14,vy:-Math.random()*12-3,s:5+Math.random()*5,c:cols[i%cols.length],r:Math.random()*6,life:1});
+  if(parts.length<=75) requestAnimationFrame(cstep);
+}
+function cstep(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts.forEach(p=>{
+    p.vy+=.36;p.x+=p.vx;p.y+=p.vy;p.vx*=.98;p.r+=.12;p.life-=.014;
+    cx.save();cx.globalAlpha=Math.max(0,p.life);cx.translate(p.x,p.y);cx.rotate(p.r);
+    cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/3,p.s,p.s/1.8);cx.restore();
+  });
+  parts=parts.filter(p=>p.life>0&&p.y<cv.height+24);
+  if(parts.length) requestAnimationFrame(cstep); else cx.clearRect(0,0,cv.width,cv.height);
+}
+
+/* Mascot & Streak & Notifications */
+const MASCOT_TIPS=[
+  'سلام قهرمان‌ها! من <b>برقی</b> هستم. این ماه عالی بودید؛ روی من کلیک کن تا نکتهٔ مخفی صرفه‌جویی بهت بگم!',
+  'نکتهٔ باحال: در بخش <b>خانهٔ هوشمند</b> اگر توان کل خانه را زیر ۸۰۰ وات بیاوری +۱۲۰ امتیاز فوری می‌گیری!',
+  'می‌دونستی کم کردن تنها ۲ درجه از دمای بخاری، تا ۱۴٪ مصرف گاز خانه رو کم می‌کنه؟',
+  'توی بخش <b>لیگ و چالش‌ها</b> یک مسابقه کوییز ۵ سوالی هست که با هر جواب درست +۵۰ امتیاز میده!',
+  'در <b>باغ خانواده</b> می‌تونی با آبیاری و کاشت نهال، باغ رو سرسبزتر کنی و پر از پروانه بشه!'
+];
+let mIdx=0;
+function mascotCheer(el){
+  mIdx=(mIdx+1)%MASCOT_TIPS.length;
+  if($('#mascotSpeech')) $('#mascotSpeech').innerHTML=MASCOT_TIPS[mIdx];
+  playSfx('coin'); confetti(el);
+}
+
+function claimStreak(btn){
+  if(state.streakClaimed){
+    playSfx('click'); toast('استریک امروزت ثبت شده! فردا دوباره سر بزن تا به '+fa(state.streak+1)+' روز برسی.');
+    return;
+  }
+  state.streakClaimed=true; state.streak++;
+  $('#streakNum').textContent=fa(state.streak)+' روز';
+  addPoints(50,btn); confetti(btn);
+  toast('استریک شما به '+fa(state.streak)+' روز رسید و +۵۰ امتیاز روزانه گرفتید!');
+}
+
+function renderNotifs(){
+  const unread=state.notifs.filter(n=>!n.read).length;
+  if($('#notifDot')) $('#notifDot').style.display=unread?'block':'none';
+  if($('#notifList')) $('#notifList').innerHTML=state.notifs.map(n=>`
+    <div class="notif-item ${n.read?'':'unread'}" onclick="clickNotif(${n.id})">
+      <div class="ni-ic" style="background:${n.bg}">${icon(n.ic,2)}</div>
+      <div><b>${n.t}</b><small>${n.s}</small></div>
+    </div>`).join('');
+}
+function toggleNotifs(){playSfx('click');const p=$('#notifPop');p.hidden=!p.hidden;if(!p.hidden)renderNotifs()}
+function clickNotif(id){
+  const n=state.notifs.find(x=>x.id===id);
+  if(n){n.read=true;renderNotifs();$('#notifPop').hidden=true;if(n.go)go(n.go)}
+}
+function markAllNotifsRead(){state.notifs.forEach(n=>n.read=true);renderNotifs();playSfx('click');toast('همهٔ اعلان‌ها خوانده شدند')}
+document.addEventListener('pointerdown',e=>{const pop=$('#notifPop'),btn=$('#notifBtn');if(pop&&!pop.hidden&&!pop.contains(e.target)&&!btn.contains(e.target))pop.hidden=true});
+
+/* ==========================================================================
+   NAVIGATION & SEARCH
+   ========================================================================== */
+const TITLES={
+  dash:['داشبورد انرژی','گزارش خانوار محمدی · مصرف این ماه ۱۴٪ کمتر از ماه قبل است.'],
+  smarthome:['خانهٔ هوشمند تعاملی','کنترل لحظه‌ای وسایل اتاق‌ها و مشاهدهٔ مصرف واقعی به وات'],
+  bills:['قبض هوشمند','قبض واقعی شما در کنار هدف ایده‌آل متناسب با خانوار و خانه‌تان'],
+  recs:['ماموریت‌های انرژی','ماموریت‌ها را کامل کنید یا ماموریت خانوادگی جدید بسازید'],
+  sim:['شبیه‌ساز قبض','ببینید تغییر کوچک در عادت‌ها چقدر در قبض بعدی اثر دارد'],
+  garden:['باغ خانواده','هر کیلووات صرفه‌جویی، یک برگ سبز تازه در باغ شما'],
+  league:['لیگ و چالش‌ها','رقابت دوستانه، چالش‌های گروهی و مسابقهٔ کوییز انرژی'],
+  rewards:['جوایز و گردونهٔ شانس','امتیازهای سبز را به تخفیف قبض و جایزه تبدیل کنید']
+};
+const rendered={};
+
+function go(v){
+  playSfx('click');
+  $$('#nav button,#mobnav button').forEach(b=>{
+    const on=b.dataset.v===v; b.classList.toggle('on',on);
+    if(on)b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
+  });
+  $$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+  $('#title').textContent=TITLES[v][0];
+  $('#subtitle').textContent=TITLES[v][1];
+  window.scrollTo({top:0,behavior:'instant'});
+  requestAnimationFrame(()=>{(RENDER[v]||(()=>{}))();rendered[v]=1});
+}
+
+function initSearch(){
+  const input=$('#globalSearch'), box=$('#searchResults'), wrap=input.closest('.search-wrap');
+  const norm=v=>v.toLowerCase().replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/\u200c/g,' ').trim();
+  const getItems=()=>{
+    const arr=Object.entries(TITLES).map(([view,[title,desc]])=>({view,title,desc,ic:$('#nav button[data-v="'+view+'"] svg').outerHTML}));
+    DEVICES.forEach(d=>arr.push({view:'smarthome',title:d.name,desc:'خانهٔ هوشمند · '+d.room,ic:icon(d.ic)}));
+    RECS.forEach(r=>arr.push({view:'recs',title:r.t,desc:'ماموریت · '+CATS[r.c],ic:icon(r.ic)}));
+    arr.push({view:'league',title:'مسابقهٔ کوییز انرژی',desc:'۵ سوال آموزشی با +۵۰ امتیاز',ic:icon('brain')});
+    return arr;
+  };
+  const close=()=>{box.hidden=true};
+  const render=()=>{
+    const q=norm(input.value); box.replaceChildren();
+    if(!q){close();return}
+    const words=q.split(/\s+/);
+    const matches=getItems().filter(it=>words.every(w=>norm(it.title+' '+it.desc).includes(w))).slice(0,8);
+    if(!matches.length) box.innerHTML='<p class="search-empty">نتیجه‌ای پیدا نشد؛ نام بخش، وسیله یا ماموریت را بنویسید.</p>';
+    else matches.forEach(it=>{
+      const b=document.createElement('button'); b.type='button'; b.className='search-option';
+      b.innerHTML=`${it.ic}<span><b>${it.title}</b><small>${it.desc}</small></span>`;
+      b.onclick=()=>{close();input.value='';go(it.view)};
+      box.append(b);
+    });
+    box.hidden=false;
+  };
+  input.addEventListener('input',render);
+  input.addEventListener('focus',render);
+  document.addEventListener('pointerdown',e=>{if(!wrap.contains(e.target))close()});
+}
+
+/* ==========================================================================
+   CHARTS (SVG)
+   ========================================================================== */
+function tipFor(el){let t=el.querySelector('.tip');if(!t){t=document.createElement('div');t.className='tip';el.appendChild(t)}return t}
+
+function barChart(el,o){
+  if(!el)return;
+  const W=el.clientWidth||660, H=o.h||280, P={t:18,r:10,b:32,l:46};
+  el.innerHTML='';
+  const s=svgEl('svg',{viewBox:`0 0 ${W} ${H}`,height:H},el);
+  const n=o.labels.length, max=Math.max(...o.a,...(o.b||[]),...(o.target||[]))*1.15;
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, gw=iw/n, bw=Math.min(22,gw*.32);
+  const X=i=>W-P.r-gw*(i+.5), Y=v=>P.t+ih-(v/max)*ih;
+  const defs=svgEl('defs',{},s), g=svgEl('linearGradient',{id:'bg'+el.id,x1:0,y1:0,x2:0,y2:1},defs);
+  svgEl('stop',{offset:0,'stop-color':o.c1||'#10B981'},g); svgEl('stop',{offset:1,'stop-color':o.c2||'#06B6D4'},g);
+
+  for(let k=0;k<=4;k++){
+    const v=max/4*k, y=Y(v);
+    svgEl('line',{x1:P.l,x2:W-P.r,y1:y,y2:y,stroke:'var(--chart-grid)','stroke-dasharray':k?'4 4':''},s);
+    const t=svgEl('text',{x:P.l-8,y:y+4,'text-anchor':'end','font-size':11,'font-weight':700,fill:'var(--chart-muted)'},s); t.textContent=fa(v);
+  }
+  const tip=tipFor(el);
+  o.labels.forEach((L,i)=>{
+    const x=X(i), last=i===n-1;
+    if(o.b) svgEl('rect',{x:x+1,y:Y(o.b[i]),width:bw,height:Y(0)-Y(o.b[i]),rx:7,fill:'var(--chart-prev)',class:'bar-anim',style:`animation-delay:${i*28}ms`},s);
+    svgEl('rect',{x:o.b?x-bw-1:x-bw/2,y:Y(o.a[i]),width:bw,height:Y(0)-Y(o.a[i]),rx:7,fill:last?'#8B5CF6':`url(#bg${el.id})`,class:'bar-anim',style:`animation-delay:${i*28}ms`},s);
+    const t=svgEl('text',{x,y:H-8,'text-anchor':'middle','font-size':11.5,fill:last?'var(--ink)':'var(--chart-muted)','font-weight':last?900:600},s); t.textContent=L;
+    const hit=svgEl('rect',{x:x-gw/2,y:P.t,width:gw,height:ih,fill:'transparent'},s);
+    hit.addEventListener('mouseenter',()=>{
+      hit.setAttribute('fill','rgba(16,185,129,.09)');
+      tip.innerHTML=`<b>${L}</b><br>امسال: <b>${fa(o.a[i])}</b> ${o.u}${o.b?`<br>پارسال: ${fa(o.b[i])} ${o.u}`:''}${o.target?`<br>هدف: <span style="color:#FBBF24">${fa(o.target[i])} ${o.u}</span>`:''}`;
+      tip.style.right=(W-x)+'px'; tip.style.left='auto'; tip.style.top=Y(o.a[i])+'px'; tip.classList.add('on');
+    });
+    hit.addEventListener('mouseleave',()=>{hit.setAttribute('fill','transparent');tip.classList.remove('on')});
+  });
+  if(o.target){
+    const d=o.target.map((v,i)=>(i?'L':'M')+X(i)+' '+Y(v)).join(' ');
+    svgEl('path',{d,fill:'none',stroke:'#F59E0B','stroke-width':3,'stroke-linecap':'round','stroke-linejoin':'round','pointer-events':'none'},s);
+    o.target.forEach((v,i)=>svgEl('circle',{cx:X(i),cy:Y(v),r:4,fill:'var(--paper)',stroke:'#F59E0B','stroke-width':2.5,'pointer-events':'none'},s));
+  }
+}
+
+function lineChart(el,o){
+  if(!el)return;
+  const W=el.clientWidth||580, H=o.h||215, P={t:20,r:14,b:28,l:52};
+  el.innerHTML='';
+  const s=svgEl('svg',{viewBox:`0 0 ${W} ${H}`,height:H},el);
+  const all=o.series.flatMap(x=>x.d), max=Math.max(...all)*1.14, min=o.min??0, n=o.labels.length;
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  const X=i=>W-P.r-iw/(n-1)*i, Y=v=>P.t+ih-((v-min)/(max-min||1))*ih;
+  if(o.peakRange){const x1=X(o.peakRange[1]),x2=X(o.peakRange[0]);svgEl('rect',{x:Math.min(x1,x2),y:P.t,width:Math.abs(x2-x1),height:ih,rx:10,fill:'rgba(244,63,94,.11)'},s)}
+  for(let k=0;k<=3;k++){
+    const v=min+(max-min)/3*k, y=Y(v);
+    svgEl('line',{x1:P.l,x2:W-P.r,y1:y,y2:y,stroke:'var(--chart-grid)','stroke-dasharray':'4 4'},s);
+    const t=svgEl('text',{x:P.l-8,y:y+4,'text-anchor':'end','font-size':11,'font-weight':700,fill:'var(--chart-muted)'},s); t.textContent=o.yf?o.yf(v):fa(v);
+  }
+  o.labels.forEach((L,i)=>{if(!L)return;const t=svgEl('text',{x:X(i),y:H-6,'text-anchor':'middle','font-size':11,'font-weight':700,fill:o.hl&&o.hl(i)?'#F43F5E':'var(--chart-muted)'},s);t.textContent=L});
+  const defs=svgEl('defs',{},s);
+  o.series.forEach((sr,k)=>{
+    const pts=sr.d.map((v,i)=>[X(i),Y(v)]);
+    let d='M'+pts[0];
+    for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x1,y1]=pts[i],cx=(x0+x1)/2;d+=` C${cx} ${y0},${cx} ${y1},${x1} ${y1}`}
+    if(sr.fill){
+      const gid='lg'+el.id+k, g=svgEl('linearGradient',{id:gid,x1:0,y1:0,x2:0,y2:1},defs);
+      svgEl('stop',{offset:0,'stop-color':sr.c,'stop-opacity':.32},g); svgEl('stop',{offset:1,'stop-color':sr.c,'stop-opacity':0},g);
+      svgEl('path',{d:d+` L${pts[pts.length-1][0]} ${Y(min)} L${pts[0][0]} ${Y(min)}Z`,fill:`url(#${gid})`},s);
+    }
+    svgEl('path',{d,fill:'none',stroke:sr.c,'stroke-width':sr.w||3,'stroke-dasharray':sr.dash||'','stroke-linecap':'round'},s);
+  });
+  const tip=tipFor(el), cur=svgEl('line',{y1:P.t,y2:P.t+ih,stroke:'var(--ink)','stroke-dasharray':'3 3',opacity:0},s);
+  const dots=o.series.map(sr=>svgEl('circle',{r:5,fill:'var(--paper)',stroke:sr.c,'stroke-width':3,opacity:0},s));
+  const ov=svgEl('rect',{x:P.l,y:P.t,width:iw,height:ih,fill:'transparent'},s);
+  ov.addEventListener('mousemove',e=>{
+    const r=s.getBoundingClientRect(), mx=(e.clientX-r.left)*W/r.width;
+    const i=Math.max(0,Math.min(n-1,Math.round((W-P.r-mx)/(iw/(n-1))))), x=X(i);
+    cur.setAttribute('x1',x);cur.setAttribute('x2',x);cur.setAttribute('opacity',.45);
+    dots.forEach((dt,k)=>{dt.setAttribute('cx',x);dt.setAttribute('cy',Y(o.series[k].d[i]));dt.setAttribute('opacity',1)});
+    const lbl=o.tipLabel?o.tipLabel(i):(o.labels[i]||faD(i));
+    tip.innerHTML=`<b style="color:#FEF08A">${lbl}</b>`+o.series.map(sr=>`<br>${sr.n}: <b>${o.tf?o.tf(sr.d[i]):fa(sr.d[i])}</b>`).join('');
+    tip.style.right=(W-x)+'px';tip.style.left='auto';tip.style.top=Math.min(...o.series.map(sr=>Y(sr.d[i])))+'px';tip.classList.add('on');
+  });
+  ov.addEventListener('mouseleave',()=>{tip.classList.remove('on');cur.setAttribute('opacity',0);dots.forEach(d=>d.setAttribute('opacity',0))});
+}
+
+function donut(el,data){
+  if(!el)return;
+  const S=220, R=92, r=62; el.innerHTML='';
+  const s=svgEl('svg',{viewBox:`0 0 ${S} ${S}`},el);
+  const tot=data.reduce((a,b)=>a+b.v,0); let a0=-Math.PI/2;
+  const c=svgEl('g',{},s);
+  const t1=svgEl('text',{x:110,y:106,'text-anchor':'middle','font-size':30,'font-weight':900,fill:'var(--ink)'},c); t1.textContent=fa(312);
+  const t2=svgEl('text',{x:110,y:129,'text-anchor':'middle','font-size':11.5,'font-weight':700,fill:'var(--mute)'},c); t2.textContent='کیلووات‌ساعت';
+  data.forEach(d=>{
+    const a1=a0+d.v/tot*Math.PI*2-.035, p=(a,rad)=>[110+rad*Math.cos(a),110+rad*Math.sin(a)], L=a1-a0>Math.PI?1:0;
+    const [x0,y0]=p(a0,R),[x1,y1]=p(a1,R),[x2,y2]=p(a1,r),[x3,y3]=p(a0,r);
+    const path=svgEl('path',{d:`M${x0} ${y0}A${R} ${R} 0 ${L} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${L} 0 ${x3} ${y3}Z`,fill:d.c,style:'transition:transform .25s cubic-bezier(.34,1.56,.64,1);transform-origin:110px 110px;cursor:pointer'},s);
+    path.addEventListener('mouseenter',()=>{path.style.transform='scale(1.07)';t1.textContent=fa(d.v)+'٪';t2.textContent=d.n});
+    path.addEventListener('mouseleave',()=>{path.style.transform='';t1.textContent=fa(312);t2.textContent='کیلووات‌ساعت'});
+    a0=a1+.035;
+  });
+}
+
+function spark(d,c){
+  const w=200, h=28, mx=Math.max(...d), mn=Math.min(...d);
+  const pts=d.map((v,i)=>`${w-i*w/(d.length-1)},${h-3-(v-mn)/(mx-mn||1)*(h-8)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="2.8" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+/* ==========================================================================
+   DATA & TARIFFS
+   ========================================================================== */
+const D={
+  e:{a:[298,335,352,330,280,262,345,420,448,390,330,312],b:[320,360,380,355,300,285,380,465,490,425,362,363],t:[290,300,305,295,265,250,310,370,390,340,295,285],u:'kWh'},
+  g:{a:[520,690,760,610,380,210,95,70,65,80,140,186],b:[560,740,810,650,410,230,105,78,72,90,160,202],t:[480,620,680,560,350,190,85,62,58,72,125,165],u:'m³'}
+};
+const elecCost=k=>{const T=[[100,450],[100,900],[100,1800],[1e9,3200]];let c=0,r=k;for(const[s,p]of T){const u=Math.min(r,s);c+=u*p;r-=u;if(r<=0)break}return c*1.1+18000};
+const gasCost=m=>{const T=[[150,1450],[150,3900],[1e9,7200]];let c=0,r=m;for(const[s,p]of T){const u=Math.min(r,s);c+=u*p;r-=u;if(r<=0)break}return c*1.09+15000};
+const billOf=i=>elecCost(D.e.a[i])+gasCost(D.g.a[i]);
+
+/* ==========================================================================
+   1. DASHBOARD
+   ========================================================================== */
+let res='e';
+const MEMBERS=[
+  {name:'علی',role:'پدر',score:86,bg:'linear-gradient(135deg,#3B82F6,#2563EB)',note:'خاموش‌کردن وسایل در حالت آماده‌به‌کار',cheered:false},
+  {name:'سارا',role:'مادر',score:92,bg:'linear-gradient(135deg,#10B981,#059669)',note:'مدیریت شستشو در ساعات کم‌باری',cheered:false},
+  {name:'آرین',role:'پسر · ۱۶ ساله',score:64,bg:'linear-gradient(135deg,#F59E0B,#EA580C)',note:'کنسول بازی زیاد روشنه؛ بیا رکورد بزنیم!',cheered:false},
+  {name:'نیکا',role:'دختر · ۱۰ ساله',score:78,bg:'linear-gradient(135deg,#EC4899,#8B5CF6)',note:'نگهبان چراغ‌های اضافی خانه',cheered:false}
+];
+
+function renderMembers(){
+  $('#members').innerHTML=MEMBERS.map((m,i)=>`
+    <div class="rowi">
+      <div class="avatar" style="background:${m.bg}">${m.name[0]}</div>
+      <div class="t">
+        <b>${m.name} <span class="tag n" style="font-size:10px">${m.role}</span></b>
+        <small>${m.note}</small>
+        <div class="meter"><i style="width:${m.score}%"></i></div>
+      </div>
+      <button type="button" class="btn ${m.cheered?'g':'p'} sm" onclick="cheerMember(${i},this)" ${m.cheered?'disabled':''}>
+        ${m.cheered?'تشویق شد ✓':'تشویق (+۱۰)'}
+      </button>
+    </div>`).join('');
+}
+function cheerMember(i,btn){
+  const m=MEMBERS[i]; if(m.cheered)return;
+  m.cheered=true; m.score=Math.min(100,m.score+4);
+  renderMembers(); addPoints(10,btn);
+  toast(`هورا! ${m.name} تشویق شد و امتیازش بالا رفت!`);
+}
+
+function renderDash(){
+  const now=billOf(11), ly=elecCost(D.e.b[11])+gasCost(D.g.b[11]);
+  $('#heroHeadline').innerHTML=`این ماه <em>${tm(ly-now)} تومان</em><br>کمتر از آبان پارسال پرداخت می‌کنید!`;
+  const ring=$('#ring');
+  ring.innerHTML=`<defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FEF08A"/><stop offset="50%" stop-color="#34D399"/><stop offset="100%" stop-color="#38BDF8"/></linearGradient></defs>
+    <circle cx="110" cy="110" r="90" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="16"/>
+    <circle id="rArc" cx="110" cy="110" r="90" fill="none" stroke="url(#rg)" stroke-width="16" stroke-linecap="round" stroke-dasharray="565.5" stroke-dashoffset="565.5" transform="rotate(-90 110 110)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.56,.64,1)"/>`;
+  setTimeout(()=>{const a=$('#rArc');if(a)a.style.strokeDashoffset=565.5*(1-.82)},80);
+  $$('#v-dash [data-count]').forEach(e=>countUp(e,+e.dataset.count));
+
+  const K=[
+    ['bolt','برق این ماه',D.e.a[11],'kWh',-14,D.e.a,'#06B6D4','linear-gradient(135deg,#06B6D4,#3B82F6)'],
+    ['flame','گاز این ماه',D.g.a[11],'m³',-8,D.g.a.slice(6),'#F97316','linear-gradient(135deg,#F97316,#F43F5E)'],
+    ['wallet','مبلغ قبض آبان',Math.round(now/1000)*1000,'تومان',-12,D.e.a.map((v,i)=>billOf(i)),'#10B981','linear-gradient(135deg,#10B981,#059669)'],
+    ['rank','رتبه در محله',3,'از ۲۴۸',null,[14,12,11,9,8,7,7,5,4,4,3,3].map(v=>-v),'#8B5CF6','linear-gradient(135deg,#8B5CF6,#EC4899)']
+  ];
+  $('#kpis').innerHTML=K.map(k=>`
+    <div class="kpi">
+      <div class="k-l"><span class="k-i" style="background:${k[7]}">${icon(k[0],2.2)}</span><span>${k[1]}</span>
+        ${k[4]!==null?`<span class="tag dn" style="margin-inline-start:auto">↓ ${fa(Math.abs(k[4]))}٪</span>`:`<span class="tag violet" style="margin-inline-start:auto">↑ ۲ پله</span>`}</div>
+      <div class="k-v num">${k[0]==='rank'?'#'+fa(k[2]):fa(k[2])}<small>${k[3]}</small></div>${spark(k[5],k[6])}
+    </div>`).join('');
+
+  drawMain();
+  donut($('#donut'),[
+    {n:'سرمایش و گرمایش',v:34,c:'#3B82F6'},{n:'یخچال و فریزر',v:18,c:'#10B981'},
+    {n:'سرگرمی و دیجیتال',v:13,c:'#8B5CF6'},{n:'روشنایی',v:14,c:'#F59E0B'},
+    {n:'لباسشویی و ظرفشویی',v:11,c:'#F43F5E'},{n:'سایر',v:10,c:'#06B6D4'}
+  ]);
+  $('#appl').innerHTML=[
+    ['thermo','کولر گازی سالن','۳ ساعت روشن در ساعت پیک',34,'linear-gradient(135deg,#3B82F6,#06B6D4)'],
+    ['fridge','یخچال ساید بای ساید','۱۲ سال عمر · رتبهٔ انرژی D',18,'linear-gradient(135deg,#10B981,#059669)']
+  ].map(r=>`<div class="rowi"><div class="ic" style="background:${r[4]}">${icon(r[0])}</div><div class="t"><b>${r[1]}</b><small>${r[2]}</small></div><span class="tag n num">${fa(r[3])}٪</span></div>`).join('');
+  renderMembers();
+  drawHourly();
+}
+function drawMain(){const d=D[res];barChart($('#mainChart'),{labels:MONTHS,a:d.a,b:d.b,target:d.t,u:d.u,h:280,c1:res==='e'?'#10B981':'#F97316',c2:res==='e'?'#06B6D4':'#F43F5E'})}
+function drawHourly(){
+  const hrs=[.42,.38,.35,.33,.33,.36,.55,.92,.85,.6,.55,.62,.78,.85,.8,.7,.75,.95,1.25,1.68,1.85,1.72,1.3,.7];
+  lineChart($('#hourly'),{labels:hrs.map((_,i)=>i%3===0?faD(i)+':۰۰':''),tipLabel:i=>'ساعت '+faD(i)+':۰۰',peakRange:[19,22],
+    series:[{n:'امروز',d:hrs,c:'#10B981',fill:1},{n:'میانگین محله',d:hrs.map((v,i)=>v*1.18+.05*Math.sin(i)),c:'#94A3B8',dash:'6 5',w:2.2}],
+    h:210,yf:v=>fa(v,1),tf:v=>fa(v,2)+' kWh',hl:i=>i>=19&&i<=22});
+}
+$('#segRes').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;playSfx('click');$$('#segRes button').forEach(x=>x.classList.toggle('on',x===b));res=b.dataset.k;drawMain()});
+
+/* ==========================================================================
+   2. SMART HOME EXPLORER
+   ========================================================================== */
+const DEVICES=[
+  {id:'ac',name:'کولر گازی سالن',room:'پذیرایی',ic:'snow',bg:'linear-gradient(135deg,#0EA5E9,#2563EB)',w:1600,on:true,eco:false,heavy:true},
+  {id:'tv',name:'تلویزیون ۵۵ اینچ',room:'پذیرایی',ic:'tv',bg:'linear-gradient(135deg,#8B5CF6,#6366F1)',w:180,on:true,eco:false},
+  {id:'ps5',name:'کنسول بازی PS5',room:'پذیرایی',ic:'game',bg:'linear-gradient(135deg,#EC4899,#8B5CF6)',w:240,on:true,eco:false},
+  {id:'halo',name:'لامپ‌های هالوژن',room:'پذیرایی',ic:'bulb',bg:'linear-gradient(135deg,#F59E0B,#EA580C)',w:260,on:true,eco:false},
+  {id:'fridge',name:'یخچال ساید بای ساید',room:'آشپزخانه',ic:'fridge',bg:'linear-gradient(135deg,#10B981,#059669)',w:210,on:true,eco:true,essential:true},
+  {id:'wash',name:'ماشین لباسشویی',room:'آشپزخانه',ic:'wash',bg:'linear-gradient(135deg,#06B6D4,#0891B2)',w:1100,on:false,eco:false,heavy:true},
+  {id:'pc',name:'کامپیوتر گیمینگ آرین',room:'اتاق آرین',ic:'pc',bg:'linear-gradient(135deg,#F43F5E,#E11D48)',w:420,on:true,eco:false},
+  {id:'desk',name:'چراغ مطالعهٔ نیکا',room:'اتاق نیکا',ic:'bulb',bg:'linear-gradient(135deg,#22C55E,#16A34A)',w:25,on:true,eco:true}
+];
+const ROOMS=['همه اتاق‌ها','پذیرایی','آشپزخانه','اتاق آرین','اتاق نیکا'];
+let shRoom='همه اتاق‌ها';
+
+const devWatts=d=>!d.on?0:Math.round(d.w*(d.eco?.65:1));
+
+function renderSmartHome(){
+  const totalW=DEVICES.reduce((a,d)=>a+devWatts(d),0);
+  const onCount=DEVICES.filter(d=>d.on).length;
+  const hourCost=Math.round((totalW/1000)*1850);
+
+  $('#shTotalW').textContent=fa(totalW);
+  $('#shHourCost').textContent=fa(hourCost);
+  $('#shOnCount').textContent=fa(onCount)+' وسیله روشن';
+
+  const pct=Math.min(100,Math.round((totalW/3200)*100));
+  const bar=$('#shGaugeBar'), badge=$('#shLoadBadge');
+  bar.style.width=pct+'%';
+  if(totalW<800){
+    bar.style.background='linear-gradient(90deg,#10B981,#34D399)';
+    $('#shTotalW').style.color='#34D399';
+    badge.className='tag dn'; badge.textContent='عالی · زیر ۸۰۰ وات';
+    if(!state.smartRewardClaimed){
+      state.smartRewardClaimed=true;
+      addPoints(120,$('#shTotalW')); confetti($('#shTotalW'));
+      toast('آفرین! مصرف لحظه‌ای زیر ۸۰۰ وات آمد و +۱۲۰ امتیاز جایزه گرفتید!');
+    }
+  }else if(totalW<1900){
+    bar.style.background='linear-gradient(90deg,#F59E0B,#FBBF24)';
+    $('#shTotalW').style.color='#FBBF24';
+    badge.className='tag amber'; badge.textContent='متوسط · قابل بهینه‌سازی';
+  }else{
+    bar.style.background='linear-gradient(90deg,#F97316,#F43F5E)';
+    $('#shTotalW').style.color='#FB7185';
+    badge.className='tag up'; badge.textContent='پرمصرف! وسایل اضافی را خاموش کنید';
+  }
+
+  $('#shRoomFilters').innerHTML=ROOMS.map(r=>`
+    <button type="button" class="chip ${r===shRoom?'on':''}" onclick="shRoom='${r}';playSfx('click');renderSmartHome()">
+      ${r} (${fa(r==='همه اتاق‌ها'?DEVICES.length:DEVICES.filter(d=>d.room===r).length)})
+    </button>`).join('');
+
+  $('#shGrid').innerHTML=DEVICES.filter(d=>shRoom==='همه اتاق‌ها'||d.room===shRoom).map(d=>{
+    const w=devWatts(d);
+    return `
+    <div class="dev-card ${d.on?'on':''} ${d.heavy&&!d.eco?'heavy':''}">
+      <div class="dev-top">
+        <div class="dev-ic" style="background:${d.bg}">${icon(d.ic,2.2)}</div>
+        <button type="button" class="sw ${d.on?'on':''}" onclick="toggleDev('${d.id}')" role="switch" aria-checked="${d.on}" aria-label="روشن یا خاموش کردن ${d.name}"></button>
+      </div>
+      <div class="dev-info">
+        <b>${d.name}</b>
+        <small>${d.room} · ${d.on?(d.eco?'روشن (حالت اکو)':'روشن'):'خاموش'}</small>
+      </div>
+      <div class="dev-ctrls">
+        <span class="num" style="font-size:13px;font-weight:900;color:${d.on?(d.heavy&&!d.eco?'var(--coral-ink)':'var(--emerald-ink)'):'var(--mute)'}">${fa(w)} وات</span>
+        <button type="button" class="eco-btn ${d.eco?'on':''}" onclick="toggleDevEco('${d.id}')" ${!d.on?'disabled':''}>حالت اکو ${d.eco?'✓':''}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDev(id){
+  const d=DEVICES.find(x=>x.id===id); if(!d)return;
+  d.on=!d.on; playSfx('click'); renderSmartHome();
+}
+function toggleDevEco(id){
+  const d=DEVICES.find(x=>x.id===id); if(!d||!d.on)return;
+  d.eco=!d.eco; playSfx('click'); renderSmartHome();
+  toast(d.eco?`حالت اکو برای ${d.name} فعال شد (۳۵٪ مصرف کمتر)`:`حالت عادی برای ${d.name} فعال شد`);
+}
+function shEcoSleep(btn){
+  DEVICES.forEach(d=>{d.on=!!d.essential;if(d.essential)d.eco=true});
+  playSfx('coin'); renderSmartHome();
+  toast('حالت خواب اکو فعال شد! همهٔ وسایل غیرضروری خاموش شدند.');
+}
+function shTurnAllEco(){
+  DEVICES.forEach(d=>{if(d.on)d.eco=true});
+  playSfx('click'); renderSmartHome();
+  toast('حالت اکو برای همهٔ وسایل روشن فعال شد!');
+}
+
+/* ==========================================================================
+   3. SMART BILLS
+   ========================================================================== */
+const P={n:4,a:110}; let bp=0;
+const BP=[{m:'آبان ۱۴۰۵',e:312,g:186,se:1,sg:1},{m:'مهر ۱۴۰۵',e:330,g:140,se:1.05,sg:.75},{m:'شهریور ۱۴۰۵',e:390,g:80,se:1.25,sg:.42}];
+function prof(k,d){
+  playSfx('click');
+  if(k==='n') P.n=Math.max(1,Math.min(8,P.n+d)); else P.a=Math.max(40,Math.min(300,P.a+d));
+  $('#pN').textContent=fa(P.n)+' نفر'; $('#pA').textContent=fa(P.a)+' متر'; renderBills();
+}
+$('#segBill').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;playSfx('click');$$('#segBill button').forEach(x=>x.classList.toggle('on',x===b));bp=+b.dataset.k;renderBills()});
+
+function renderBills(){
+  const c=+$('#pC').value, B=BP[bp];
+  const ie=Math.round((60+35*P.n+.7*P.a)*B.se*(c<1?1.35:1)), ig=Math.round((20+10*P.n+.8*P.a)*B.sg*c);
+  const items=[
+    {k:'e',t:'قبض برق',s:'شناسه ۷۲۴۱۰۹۸۳۵ · توانیر',u:'کیلووات‌ساعت',v:B.e,i:ie,f:elecCost,ic:'bolt'},
+    {k:'gas',t:'قبض گاز',s:'اشتراک ۵۵۰۸۱۲۲ · گاز تهران',u:'مترمکعب',v:B.g,i:ig,f:gasCost,ic:'flame'}
+  ];
+  $('#billCards').innerHTML=items.map(x=>{
+    const cost=x.f(x.v), ic=x.f(x.i), over=cost-ic, pct=Math.round((x.v-x.i)/x.i*100), mx=Math.max(x.v,x.i)*1.45;
+    const paid=!!state.paidBills[`${bp}-${x.k}`];
+    return `
+    <div class="bill">
+      <div class="bill-h ${x.k}"><div class="ic">${icon(x.ic,2.3)}</div><div><b>${x.t} · ${B.m}</b><small>${x.s}</small></div>
+        <div class="amt"><small>${paid?'پرداخت‌شده ✓':'مبلغ قابل پرداخت'}</small><b class="num">${tm(cost)}</b> <small>تومان</small></div></div>
+      <div class="bill-b">
+        <div class="bill-row"><span>مصرف دوره</span><b class="num">${fa(x.v)} ${x.u}</b></div>
+        <div class="bill-row"><span>هدف ایده‌آل خانوار شما</span><b class="num" style="color:var(--emerald-ink)">${fa(x.i)} ${x.u}</b></div>
+        <div class="bill-row"><span>وضعیت الگو</span>${pct>0?`<span class="tag up">${fa(pct)}٪ بالاتر از هدف</span>`:`<span class="tag dn">${fa(-pct)}٪ زیر هدف</span>`}</div>
+        <div class="target-bar"><div class="mk" style="right:${Math.min(94,x.v/mx*100)}%"><span>شما: ${fa(x.v)}</span></div><div class="mk ideal" style="right:${Math.min(94,x.i/mx*100)}%"><span>ایده‌آل: ${fa(x.i)}</span></div></div>
+        <div class="cmp">
+          <div><small>مبلغ با مصرف ایده‌آل</small><b class="num">${tm(ic)}</b> <small style="display:inline">تومان</small></div>
+          <div class="${over>0?'bad':'good'}"><small>${over>0?'اضافه پرداخت قابل‌حذف':'صرفه‌جویی نسبت به هدف'}</small><b class="num" style="color:${over>0?'var(--coral-ink)':'var(--emerald-ink)'}">${tm(Math.abs(over))}</b> <small style="display:inline">تومان</small></div>
+        </div>
+        <button type="button" class="btn ${paid?'g':'p'}" style="width:100%;margin-top:14px" ${paid?'disabled':''} onclick="payDemoBill('${bp}-${x.k}','${x.t}',this)">
+          ${paid?'قبض پرداخت‌شده است ✓':'پرداخت آزمایشی قبض (+۷۵ امتیاز)'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const rows=[...Array(6)].map((_,k)=>{
+    const i=11-k, tot=billOf(i), tg=elecCost(D.e.t[i])+gasCost(D.g.t[i]), df=tot-tg;
+    return `<tr><td><b>${MONTHS[i]}</b></td><td class="num">${fa(D.e.a[i])}</td><td class="num">${fa(D.g.a[i])}</td><td class="num"><b>${tm(tot)}</b></td>
+      <td><span class="tag ${df>0?'up':'dn'} num">${df>0?'+':'−'}${tm(Math.abs(df))}</span></td><td><span class="tag dn">✓ پرداخت‌شده</span></td></tr>`;
+  }).join('');
+  $('#billTable').innerHTML=`<thead><tr><th>دوره</th><th>برق (kWh)</th><th>گاز (m³)</th><th>مبلغ کل (تومان)</th><th>اختلاف با هدف</th><th>وضعیت</th></tr></thead><tbody>${rows}</tbody>`;
+}
+function payDemoBill(key,title,btn){
+  state.paidBills[key]=true; renderBills(); addPoints(75,btn); confetti(btn);
+  toast(`${title} به‌صورت آزمایشی پرداخت شد و +۷۵ امتیاز گرفتید!`);
+}
+
+/* ==========================================================================
+   4. MISSIONS & CUSTOM MISSION CREATOR
+   ========================================================================== */
+const RECS=[
+  {c:'h',ic:'thermo',t:'دمای ترموستات را ۲ درجه پایین بیاورید',d:'از ۲۳ به ۲۱ درجه در ساعات حضور و ۱۸ درجه در شب؛ با پوشیدن یک لایه لباس گرم تفاوتی حس نمی‌شود.',s:1450000,k:0,gas:22,e:1,pts:150,done:true},
+  {c:'a',ic:'fridge',t:'تعویض نوار لاستیکی درب یخچال',d:'آزمون کاغذ نشان می‌دهد درب یخچال شما نشتی دارد؛ تعویض واشر بسیار بصرفه است.',s:980000,k:21,e:1,pts:150,done:false},
+  {c:'b',ic:'clock',t:'لباسشویی را به بعد از ساعت ۲۳ منتقل کنید',d:'با تعرفهٔ کم‌باری شب، هزینهٔ هر بار شستشو تا ۴۰٪ ارزان‌تر می‌شود.',s:620000,k:0,e:1,pts:150,done:true},
+  {c:'l',ic:'bulb',t:'۸ لامپ باقیمانده را LED کنید',d:'لامپ‌های کم‌مصرف آشپزخانه و راهرو هنوز قدیمی هستند؛ بازگشت سرمایه کمتر از ۵ ماه.',s:760000,k:17,e:2,pts:150,done:false},
+  {c:'a',ic:'plug',t:'چندراهی هوشمند برای میز تلویزیون',d:'کنسول بازی، گیرنده و تلویزیون در حالت آماده‌به‌کار ماهانه ۱۸ کیلووات‌ساعت مصرف می‌کنند.',s:540000,k:18,e:1,pts:150,done:false},
+  {c:'h',ic:'window',t:'درزگیری پنجره‌های اتاق خواب',d:'حدود ۱۲٪ گرمای خانه از درز پنجره‌ها هدر می‌رود.',s:1820000,k:0,gas:28,e:3,pts:150,done:false},
+  {c:'b',ic:'shower',t:'زمان دوش را به ۷ دقیقه برسانید',d:'آرین میانگین ۱۴ دقیقه دوش می‌گیرد؛ یک چالش خانوادگی ۷ دقیقه‌ای تعریف کنید.',s:690000,k:0,gas:11,e:1,pts:150,done:false},
+  {c:'h',ic:'snow',t:'سرویس فیلتر کولر گازی',d:'فیلتر کثیف بازده کولر را تا ۱۵٪ کاهش می‌دهد.',s:410000,k:12,e:2,pts:150,done:true}
+];
+let recCat='all';
+const CATS={all:'همه',h:'گرمایش و سرمایش',a:'وسایل برقی',l:'روشنایی',b:'عادت‌ها'};
+const CAT_BG={h:'linear-gradient(135deg,#F97316,#EF4444)',a:'linear-gradient(135deg,#3B82F6,#6366F1)',l:'linear-gradient(135deg,#F59E0B,#EAB308)',b:'linear-gradient(135deg,#10B981,#06B6D4)'};
+
+function renderRecs(){
+  $('#recF').innerHTML=Object.entries(CATS).map(([k,v])=>`
+    <button type="button" class="chip ${k===recCat?'on':''}" data-k="${k}">${v} <span class="num">(${fa(k==='all'?RECS.length:RECS.filter(r=>r.c===k).length)})</span></button>`).join('');
+  $('#recList').innerHTML=RECS.map((r,i)=>({r,i})).filter(x=>recCat==='all'||x.r.c===recCat).map(({r,i})=>`
+    <div class="rec ${r.done?'done':''}" data-i="${i}">
+      <div class="ic" style="background:${CAT_BG[r.c]||CAT_BG.b}">${icon(r.ic,2.2)}</div>
+      <div>
+        <b>${r.t}</b>
+        <p>${r.d}</p>
+        <div class="eff">
+          ${[1,2,3].map(n=>`<i class="${n<=r.e?'f':''}"></i>`).join('')}
+          <small style="font-size:11px;color:var(--mute)">${['','آسان','متوسط','نیازمند هزینه'][r.e]}</small>
+          <span class="tag violet num" style="font-size:10px">+${fa(r.pts||150)} امتیاز</span>
+        </div>
+      </div>
+      <div class="sv"><b class="num">${fa(Math.round(r.s/1000))} هزار</b><small>تومان در سال</small></div>
+      <button type="button" class="chk" aria-pressed="${r.done}" aria-label="${r.t}">${icon('check',3)}</button>
+    </div>`).join('');
+
+  const dn=RECS.filter(r=>r.done), sum=dn.reduce((a,r)=>a+r.s,0);
+  countUp($('#recSum'),sum,600);
+  $('#recPct').textContent=fa(Math.round(dn.length/RECS.length*100))+'٪';
+  $('#recBar').style.width=(dn.length/RECS.length*100)+'%';
+  const kwh=dn.reduce((a,r)=>a+r.k+(r.gas||0)*.6+12,0);
+  $('#recKwh').textContent=fa(Math.round(kwh));
+  $('#recCo2').textContent=fa(Math.round(kwh*.62));
+  if($('#recBadge')) $('#recBadge').textContent=fa(RECS.length-dn.length);
+}
+$('#recF').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;playSfx('click');recCat=b.dataset.k;renderRecs()});
+$('#recList').addEventListener('click',e=>{
+  const b=e.target.closest('.chk'); if(!b)return;
+  const i=+b.closest('.rec').dataset.i, r=RECS[i];
+  r.done=!r.done; renderRecs();
+  if(r.done){addPoints(r.pts||150,b);confetti(b);toast(`ماموریت «${r.t}» کامل شد!`)}
+  else{addPoints(-(r.pts||150),b);playSfx('click');toast('ماموریت به حالت انجام‌نشده برگشت')}
+});
+function addCustomMission(){
+  const title=$('#cmTitle').value.trim(), cat=$('#cmCat').value, pts=+$('#cmPts').value;
+  if(!title)return;
+  const icMap={b:'star',h:'thermo',a:'plug',l:'bulb'};
+  RECS.unshift({c:cat,ic:icMap[cat]||'star',t:title,d:'ماموریت اختصاصی ساخته‌شده توسط اعضای خانواده برای صرفه‌جویی بیشتر.',s:480000,k:12,e:1,pts,done:false});
+  $('#cmTitle').value=''; recCat='all'; renderRecs(); playSfx('win');
+  toast(`ماموریت جدید «${title}» به لیست اضافه شد!`);
+}
+
+/* ==========================================================================
+   5. SIMULATOR
+   ========================================================================== */
+const SL=[
+  {id:'temp',ic:'thermo',bg:'linear-gradient(135deg,#F97316,#EF4444)',t:'دمای ترموستات در زمستان',min:17,max:26,v:23,u:'°',def:23},
+  {id:'ac',ic:'snow',bg:'linear-gradient(135deg,#06B6D4,#3B82F6)',t:'ساعات کار کولر/بخاری برقی در روز',min:0,max:12,v:6,u:' ساعت',def:6},
+  {id:'light',ic:'bulb',bg:'linear-gradient(135deg,#F59E0B,#EAB308)',t:'ساعات روشنایی کامل خانه',min:2,max:10,v:6,u:' ساعت',def:6},
+  {id:'wash',ic:'wash',bg:'linear-gradient(135deg,#8B5CF6,#6366F1)',t:'دفعات لباسشویی و ظرفشویی در هفته',min:1,max:12,v:5,u:' بار',def:5},
+  {id:'shower',ic:'shower',bg:'linear-gradient(135deg,#10B981,#14B8A6)',t:'میانگین مدت دوش هر نفر',min:3,max:20,v:12,u:' دقیقه',def:12}
+];
+const TG=[
+  {id:'led',t:'استفاده از لامپ‌های LED',s:'کاهش ۶۰٪ مصرف روشنایی',v:false},
+  {id:'stand',t:'قطع کامل حالت آماده‌به‌کار',s:'چندراهی هوشمند شبانه',v:false},
+  {id:'night',t:'جابه‌جایی شستشو به ساعات کم‌باری',s:'تعرفهٔ شبانه ارزان‌تر',v:false},
+  {id:'seal',t:'درزگیری درها و پنجره‌ها',s:'کاهش ۱۰٪ اتلاف حرارت',v:false}
+];
+function simCalc(S,T){
+  const ac=S.ac*.9*30, li=S.light*.25*30*(T.led?.4:1), wa=S.wash*1.1*4.3, sb=T.stand?2:18, e=63.4+ac+li+wa+sb;
+  const heat=120*(1+.07*(S.temp-23))*(T.seal?.9:1), gas=22.8+heat+4*S.shower*.03*30;
+  return {e,gas,cost:elecCost(e)+gasCost(gas)-(T.night?wa*1500:0)};
+}
+function fillRange(r){if(r)r.style.setProperty('--p',(r.value-r.min)/(r.max-r.min)*100+'%')}
+function renderSimUI(){
+  $('#sliders').innerHTML=SL.map(s=>`<div class="slider"><div class="h"><span class="ic" style="background:${s.bg}">${icon(s.ic,2.2)}</span><b>${s.t}</b><output class="num" id="o-${s.id}">${fa(s.v)}${s.u}</output></div><input type="range" min="${s.min}" max="${s.max}" value="${s.v}" data-id="${s.id}"></div>`).join('');
+  $('#toggles').innerHTML=TG.map(t=>`<div class="toggle"><button type="button" class="sw ${t.v?'on':''}" data-id="${t.id}" role="switch" aria-checked="${t.v}"></button><div><b style="font-size:13px">${t.t}</b><br><small style="color:var(--mute);font-size:11.5px">${t.s}</small></div></div>`).join('');
+  $$('#sliders input').forEach(fillRange);
+}
+function simUpdate(){
+  const S={},T={},B={}; SL.forEach(s=>{S[s.id]=s.v;B[s.id]=s.def}); TG.forEach(t=>T[t.id]=t.v);
+  const base=simCalc(B,{}), nw=simCalc(S,T), diff=base.cost-nw.cost, sv=Math.max(0,diff), pct=diff/base.cost*100;
+  $('#sSave').textContent=(diff<0?'+':'')+tm(Math.abs(diff));
+  $('#sSave').style.color=diff<0?'#FB7185':'#34D399';
+  $('#sPct').textContent=(diff<0?'−':'')+fa(Math.abs(pct),1)+'٪';
+  $('#sYear').textContent=tm(sv*12*.85);
+  $('#sScore').textContent='+'+fa(Math.max(0,Math.round(pct*12)));
+  $('#sNow').textContent=tm(base.cost)+' تومان'; $('#sNew').textContent=tm(nw.cost)+' تومان';
+  $('#bNew').style.width=Math.min(100,nw.cost/base.cost*100)+'%';
+  const F=[1.2,1.45,1.55,1.3,.95,.8];
+  lineChart($('#simChart'),{labels:['آذر','دی','بهمن','اسفند','فروردین','اردیبهشت'],h:200,min:0,
+    series:[{n:'بدون تغییر',d:F.map(f=>base.cost*f),c:'#94A3B8',dash:'6 5',w:2.2},{n:'با عادت‌های جدید',d:F.map(f=>nw.cost*f),c:'#10B981',fill:1}],
+    yf:v=>fa(Math.round(v/1e5)/10,1)+'م',tf:v=>tm(v)+' ت'});
+}
+$('#sliders').addEventListener('input',e=>{const r=e.target,s=SL.find(x=>x.id===r.dataset.id);if(!s)return;s.v=+r.value;fillRange(r);$('#o-'+s.id).textContent=fa(s.v)+s.u;simUpdate()});
+$('#toggles').addEventListener('click',e=>{const b=e.target.closest('.sw');if(!b)return;playSfx('click');const t=TG.find(x=>x.id===b.dataset.id);t.v=!t.v;b.classList.toggle('on',t.v);b.setAttribute('aria-checked',String(t.v));simUpdate()});
+function simReset(){playSfx('click');SL.forEach(s=>s.v=s.def);TG.forEach(t=>t.v=false);renderSimUI();simUpdate();toast('شبیه‌ساز به عادت‌های فعلی بازگشت')}
+function simFromRecs(){
+  const d=id=>RECS.find(r=>r.ic===id)?.done;
+  TG[0].v=!!d('bulb');TG[1].v=!!d('plug');TG[2].v=!!d('clock');TG[3].v=!!d('window');
+  SL[0].v=d('thermo')?21:23; SL[4].v=d('shower')?7:12;
+  toast('ماموریت‌های انجام‌شده در شبیه‌ساز اعمال شدند!');
+}
+
+/* ==========================================================================
+   6. INTERACTIVE MAGIC GARDEN
+   ========================================================================== */
+const lerp=(a,b,t)=>a+(b-a)*t, hx=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)), mix=(a,b,t)=>`rgb(${hx(a).map((v,i)=>Math.round(lerp(v,hx(b)[i],t))).join(',')})`;
+let gBuilt=false; const PL=[];
+
+function buildGarden(){
+  const s=$('#garden'); gBuilt=true;
+  s.innerHTML=`<defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop id="sk1" offset="0"/><stop id="sk2" offset="1"/></linearGradient>
+    <radialGradient id="sunG"><stop offset="0" stop-color="#FFFDE7"/><stop offset=".45" stop-color="#FDE047" stop-opacity=".85"/><stop offset="1" stop-color="#FDE047" stop-opacity="0"/></radialGradient>
+    <linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop id="h1a" offset="0"/><stop id="h1b" offset="1"/></linearGradient>
+    <linearGradient id="h2" x1="0" y1="0" x2="0" y2="1"><stop id="h2a" offset="0"/><stop id="h2b" offset="1"/></linearGradient>
+  </defs>
+  <rect width="1000" height="460" fill="url(#sky)"/>
+  <circle id="sun" cx="820" cy="110" r="128" fill="url(#sunG)"/><circle cx="820" cy="110" r="36" fill="#FEF08A"/>
+  <g id="smog"><ellipse cx="300" cy="120" rx="260" ry="50" fill="#8B8173" opacity=".4"/><ellipse cx="650" cy="95" rx="220" ry="42" fill="#8B8173" opacity=".35"/></g>
+  <g class="float" fill="#fff"><g opacity=".9"><ellipse cx="200" cy="92" rx="54" ry="18"/><ellipse cx="232" cy="78" rx="36" ry="22"/></g><g opacity=".78"><ellipse cx="560" cy="64" rx="48" ry="15"/><ellipse cx="590" cy="52" rx="30" ry="18"/></g></g>
+  <path d="M0 280 C150 210 300 240 450 225 C620 205 760 250 1000 215 L1000 460 L0 460Z" fill="url(#h2)"/>
+  <path d="M0 330 C180 290 320 315 520 300 C700 288 850 310 1000 295 L1000 460 L0 460Z" fill="url(#h1)"/>
+  <g transform="translate(462 246)">
+    <rect x="0" y="22" width="82" height="56" rx="6" fill="#FFFBEB"/><path d="M-10 26 L41 -10 L92 26Z" fill="#0F766E"/>
+    <rect x="33" y="46" width="16" height="32" rx="4" fill="#B45309"/>
+    <rect x="9" y="34" width="15" height="14" rx="3" fill="#FDE047"/><rect x="58" y="34" width="15" height="14" rx="3" fill="#FDE047"/>
+    <rect x="12" y="10" width="58" height="11" rx="2" fill="#0284C7" transform="skewY(-30) translate(0 32)" id="panel"/>
+  </g>
+  <g id="plants"></g><g id="extraPlants"></g><g id="flies"></g>`;
+
+  const g=$('#plants');
+  const spots=[[90,340,1.1,5],[180,328,.85,15],[270,348,1.15,25],[370,332,.9,35],[640,340,1,10],[730,328,.85,30],[830,346,1.15,20],[920,332,.95,45],
+    [140,382,.72,55],[420,390,.75,50],[600,385,.7,60],[880,390,.82,65],[310,405,.62,75],[760,408,.68,80],[45,400,.78,88],[965,380,.72,92]];
+  spots.forEach(([x,y,sc,th],i)=>{
+    const kind=i%3, el=svgEl('g',{transform:`translate(${x} ${y})`},g), p=svgEl('g',{class:'plant'},el);
+    p.style.transformBox='fill-box'; p.style.transformOrigin='50% 100%';
+    const inner=svgEl('g',{class:'sway',style:`animation-delay:${-i*.7}s`},p);
+    if(kind===2) inner.innerHTML=`<path d="M0 0 L0 -${60*sc}" stroke="#78350F" stroke-width="${6*sc}"/><path d="M0 -${150*sc} L-${30*sc} -${40*sc} L${30*sc} -${40*sc}Z" class="cn"/><path d="M0 -${120*sc} L-${36*sc} -${20*sc} L${36*sc} -${20*sc}Z" class="cn2"/>`;
+    else inner.innerHTML=`<path d="M0 0 Q2 -${30*sc} 0 -${55*sc}" stroke="#78350F" stroke-width="${7*sc}" fill="none" stroke-linecap="round"/><circle cy="-${80*sc}" r="${34*sc}" class="cn"/><circle cx="-${22*sc}" cy="-${62*sc}" r="${24*sc}" class="cn2"/><circle cx="${24*sc}" cy="-${64*sc}" r="${22*sc}" class="cn2"/>`;
+    PL.push({p,th,el:inner});
+  });
+  for(let i=0;i<24;i++){
+    const f=svgEl('g',{transform:`translate(${30+Math.random()*940} ${365+Math.random()*75})`,class:'flw'},g);
+    const c=['#FDE047','#FB7185','#FFFFFF','#A78BFA','#38BDF8'][i%5];
+    f.innerHTML=`<path d="M0 0 V-13" stroke="#15803D" stroke-width="2.2"/><circle cy="-15" r="5" fill="${c}"/><circle cy="-15" r="2" fill="#F59E0B"/>`;
+    f.dataset.th=Math.round(28+Math.random()*66); f.style.transition='opacity .8s';
+  }
+  const fl=$('#flies');
+  for(let i=0;i<5;i++){
+    const b=svgEl('g',{class:'float',style:`animation-delay:${-i}s;animation-duration:${4+i}s`},fl);
+    b.innerHTML=`<g transform="translate(${150+i*170} ${175+(i%2)*42})"><ellipse rx="8" ry="5" cx="-6" fill="${i%2?'#FDE047':'#F472B6'}"/><ellipse rx="8" ry="5" cx="6" fill="${i%2?'#FDE047':'#F472B6'}"/><rect x="-1" y="-5" width="2" height="10" fill="#0F172A"/></g>`;
+  }
+}
+
+function garden(v){
+  state.gardenEff=v;
+  if(!gBuilt) buildGarden();
+  const r=$('#gRange'); if(r){r.value=v;fillRange(r)}
+  const t=v/100;
+  $('#sk1').setAttribute('stop-color',mix('#94A3B8','#38BDF8',t)); $('#sk2').setAttribute('stop-color',mix('#CBD5E1','#DCFCE7',t));
+  $('#h2a').setAttribute('stop-color',mix('#A1887F','#4ADE80',t)); $('#h2b').setAttribute('stop-color',mix('#795548','#16A34A',t));
+  $('#h1a').setAttribute('stop-color',mix('#B08968','#22C55E',t)); $('#h1b').setAttribute('stop-color',mix('#6D4C41','#15803D',t));
+  $('#smog').style.opacity=Math.max(0,1-t*1.6); $('#sun').style.opacity=.3+t*.7;
+  $('#flies').style.opacity=t>.65?1:0; $('#panel').style.opacity=t>.5?.95:0;
+  PL.forEach(p=>{const on=v>=p.th;p.p.style.transform=on?'scale(1)':'scale(0)';p.p.style.opacity=on?1:0;
+    p.el.querySelectorAll('.cn').forEach(c=>c.setAttribute('fill',mix('#8D9965','#16A34A',t)));
+    p.el.querySelectorAll('.cn2').forEach(c=>c.setAttribute('fill',mix('#7A8652','#4ADE80',t)));});
+  $$('#plants .flw').forEach(f=>f.style.opacity=v>=+f.dataset.th?1:0);
+  const st=[[0,'خاک تشنه'],[20,'جوانه‌های امید'],[40,'نهالستان'],[60,'باغ شکوفا'],[85,'جنگل سبز']];
+  $('#gPct').textContent=fa(v)+'٪'; $('#gVal').textContent=fa(v); $('#gStage').textContent=st.filter(s=>v>=s[0]).pop()[1];
+  $('#gTrees').textContent=fa(PL.filter(p=>v>=p.th).length+state.extraTrees);
+  $('#miles').innerHTML=st.map(s=>`<div class="ms ${v>=s[0]?'ok':''}"><div class="d">${v>=s[0]?icon('check',3):icon('leaf',2)}</div><b>${s[1]}</b><small class="num">${fa(s[0])}٪</small></div>`).join('');
+}
+function waterGarden(btn){
+  const nv=Math.min(100,state.gardenEff+5);
+  garden(nv); playSfx('coin'); confetti(btn);
+  toast(nv===100?'باغ شما به حداکثر سرسبزی (۱۰۰٪) رسید!':'باغ آبیاری شد و سرسبزی ۵٪ افزایش یافت!');
+}
+function plantNewTree(btn){
+  if(state.pts<100){playSfx('buzz');toast('برای کاشت نهال جدید حداقل ۱۰۰ امتیاز لازم است');return}
+  addPoints(-100,btn); state.extraTrees++;
+  const ex=$('#extraPlants'), x=120+((state.extraTrees*137)%760), y=345+((state.extraTrees*43)%60);
+  const g=svgEl('g',{transform:`translate(${x} ${y})`},ex);
+  g.innerHTML=`<g class="sway"><path d="M0 0 L0 -52" stroke="#78350F" stroke-width="7" stroke-linecap="round"/><circle cy="-68" r="28" fill="#10B981"/><circle cx="-18" cy="-54" r="18" fill="#34D399"/><circle cx="18" cy="-54" r="18" fill="#34D399"/><circle cx="-6" cy="-74" r="4.5" fill="#FDE047"/><circle cx="10" cy="-62" r="4.5" fill="#FB7185"/></g>`;
+  garden(Math.min(100,state.gardenEff+3)); playSfx('win'); confetti($('#garden'));
+  toast('نهال جدید با شکوفه در باغ خانواده کاشته شد!');
+}
+$('#gRange').addEventListener('input',e=>garden(+e.target.value));
+function renderGardenSide(){
+  $('#gMembers').innerHTML=[
+    ['سارا','linear-gradient(135deg,#10B981,#059669)',5,'۲ درخت · ۳ گل'],
+    ['علی','linear-gradient(135deg,#3B82F6,#2563EB)',4,'۲ درخت · ۲ بوته'],
+    ['نیکا','linear-gradient(135deg,#EC4899,#8B5CF6)',3,'۳ گل رنگارنگ'],
+    ['آرین','linear-gradient(135deg,#F59E0B,#EA580C)',1,'۱ جوانه · در حال رشد']
+  ].map(m=>`<div class="rowi"><div class="avatar" style="background:${m[1]}">${m[0][0]}</div><div class="t"><b>${m[0]}</b><small>${m[3]}</small><div class="meter"><i style="width:${m[2]*20}%"></i></div></div><b class="num" style="font-size:18px;color:var(--emerald-ink)">${fa(m[2])}</b></div>`).join('');
+}
+
+/* ==========================================================================
+   7. LEAGUE, CHALLENGES & ENERGY QUIZ
+   ========================================================================== */
+const FAM=[
+  ['خانوادهٔ کریمی','ک','linear-gradient(135deg,#F59E0B,#EA580C)',3120,18,'↑'],
+  ['خانوادهٔ احمدی','ا','linear-gradient(135deg,#06B6D4,#2563EB)',2985,16,'↑'],
+  ['خانوادهٔ محمدی','م','linear-gradient(135deg,#10B981,#059669)',2720,14,'↑',1],
+  ['خانوادهٔ رضایی','ر','linear-gradient(135deg,#8B5CF6,#6366F1)',2690,13,'↓'],
+  ['خانوادهٔ نوری','ن','linear-gradient(135deg,#F43F5E,#EC4899)',2410,11,'↑'],
+  ['خانوادهٔ حسینی','ح','linear-gradient(135deg,#14B8A6,#0EA5E9)',2305,10,'↓'],
+  ['خانوادهٔ صادقی','ص','linear-gradient(135deg,#84CC16,#10B981)',2150,9,'↑'],
+  ['خانوادهٔ جعفری','ج','linear-gradient(135deg,#F97316,#F59E0B)',1980,7,'↓']
+];
+const CHALS=[
+  {t:'هفتهٔ بدون آماده‌به‌کار',s:'شما در برابر خانوادهٔ رضایی',p:62,left:'۳ روز مانده',r:'۲۰۰ امتیاز'},
+  {t:'چالش دوش ۷ دقیقه‌ای',s:'گروه همسایه‌های سبز · ۶ خانوار',p:48,left:'۵ روز مانده',r:'۳۵۰ امتیاز'},
+  {t:'خاموشی ساعت پیک',s:'کل محلهٔ یوسف‌آباد',p:74,left:'۱ روز مانده',r:'کوپن ۱۰٪'}
+];
+let lg='n';
+
+function renderLeague(){
+  let L=FAM.map(f=>[...f]);
+  const me=L.find(f=>f[6]); if(me) me[3]=state.pts;
+  if(lg==='c'){
+    L=[
+      ['خانوادهٔ توکلی','ت','linear-gradient(135deg,#F59E0B,#D97706)',5210,24,'↑'],
+      ['خانوادهٔ مرادی','م','linear-gradient(135deg,#06B6D4,#0284C7)',4980,22,'↑'],
+      ['خانوادهٔ بهرامی','ب','linear-gradient(135deg,#8B5CF6,#7C3AED)',4870,21,'↓'],
+      ...L
+    ];
+  }
+  if(lg==='f') L=[L[2],L[3],L[4],L[6]];
+  L.sort((a,b)=>b[3]-a[3]); L=L.slice(0,8);
+
+  const top=L.slice(0,3), ord=[top[1],top[0],top[2]];
+  $('#podium').innerHTML=ord.map((f,k)=>{
+    const r=[2,1,3][k];
+    return `<div class="pod p${r}"><div class="av" style="background:${f[2]}">${r===1?`<span class="cr">${icon('crown',2.2)}</span>`:''}${f[1]}</div><b>${f[0]}</b><small class="num">${fa(f[3])} امتیاز</small><div class="st num">${fa(r)}</div></div>`;
+  }).join('');
+
+  $('#leagueTable').innerHTML=`<thead><tr><th>رتبه</th><th>خانوار</th><th>امتیاز</th><th>کاهش مصرف</th><th>روند</th></tr></thead><tbody>`+L.map((f,i)=>`
+    <tr class="${f[6]?'me':''}"><td><span class="rk num">${fa(i+1)}</span></td>
+      <td><div class="who"><div class="avatar" style="background:${f[2]}">${f[1]}</div><b>${f[0]}${f[6]?' <span class="tag dn">شما</span>':''}</b></div></td>
+      <td class="num"><b>${fa(f[3])}</b></td>
+      <td><div class="meter" style="width:105px;margin:0"><i style="width:${f[4]*4}%"></i></div><small class="num" style="color:var(--mute)">${fa(f[4])}٪</small></td>
+      <td><span class="trend ${f[5]==='↑'?'u':'d'} num">${f[5]} ${fa(1+i%3)}</span></td></tr>`).join('')+'</tbody>';
+}
+$('#segLeague').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;playSfx('click');$$('#segLeague button').forEach(x=>x.classList.toggle('on',x===b));lg=b.dataset.k;renderLeague()});
+
+function renderLeagueSide(){
+  $('#chals').innerHTML=CHALS.map((c,i)=>`
+    <div class="chal">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:13.5px">${c.t}</b><span class="tag amber">${c.left}</span></div>
+      <small style="color:var(--mute);font-weight:600">${c.s}</small>
+      <div class="vs"><b class="num" style="color:var(--emerald-ink);font-size:13px">${fa(c.p)}٪</b><div class="bar"><i style="width:${c.p}%"></i></div><b class="num" style="color:var(--coral-ink);font-size:13px">${fa(100-c.p)}٪</b></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <small style="color:var(--mute);font-weight:700">جایزه: <span class="tag violet">${c.r}</span></small>
+        <button type="button" class="btn p sm" onclick="boostChal(${i},this)" ${c.p>=100?'disabled':''}>${c.p>=100?'تکمیل شد ✓':'ثبت مشارکت امروز (+۵٪)'}</button>
+      </div>
+    </div>`).join('');
+
+  $('#ach').innerHTML=[
+    ['leaf','اولین قدم',100],['bolt','شکارچی پیک',100],['bulb','خانهٔ LED',100],
+    ['flame','گرمای هوشمند',100],['trophy','سه ماه پیاپی',100],['leaf','۱۰ درخت',100],
+    ['home','همه با هم',70],['star','قهرمان کربن',40],['snow','زمستان سبز',15]
+  ].map(a=>`
+    <button type="button" class="badge ${a[2]<100?'lock':''}" style="--v:${a[2]}%" onclick="playSfx('click');toast('${a[1]}: ${a[2]<100?'پیشرفت '+fa(a[2])+'٪':'این نشان را کسب کرده‌اید!'}')">
+      <div class="bi"><span>${icon(a[0],2)}</span></div><b>${a[1]}</b><small>${a[2]===100?'باز شد ✓':fa(a[2])+'٪'}</small>
+    </button>`).join('');
+  renderQuiz();
+}
+function boostChal(i,btn){
+  const c=CHALS[i]; if(c.p>=100)return;
+  c.p=Math.min(100,c.p+5);
+  renderLeagueSide(); addPoints(30,btn); confetti(btn);
+  toast(`مشارکت امروز در «${c.t}» ثبت شد (+۳۰ امتیاز)!`);
+}
+
+/* Energy Quiz */
+const QUIZ=[
+  {q:'ساعات پیک مصرف برق (گران‌ترین تعرفه) معمولاً چه ساعت‌هایی هستند؟',opts:['۶ تا ۱۰ صبح','۱۹ تا ۲۳ شب','۱۲ تا ۱۴ ظهر','۲ تا ۵ بامداد'],a:1,exp:'در ساعات ۱۹ تا ۲۳ بیشترین فشار روی شبکه است و استفاده از وسایل پرمصرف هزینه را بالا می‌برد.'},
+  {q:'کم کردن دمای بخاری به اندازهٔ ۲ درجه چقدر در مصرف گاز صرفه‌جویی می‌کند؟',opts:['حدود ۱ درصد','حدود ۱۲ تا ۱۴ درصد','تاثیری ندارد','۵۰ درصد'],a:1,exp:'هر ۱ درجه کاهش دما حدود ۶ تا ۷ درصد مصرف گاز گرمایشی خانه را کم می‌کند.'},
+  {q:'مصرف برق لامپ LED نسبت به لامپ رشته‌ای قدیمی چقدر کمتر است؟',opts:['۱۰ درصد کمتر','۳۰ درصد کمتر','تا ۸۰ درصد کمتر','برابر هستند'],a:2,exp:'لامپ‌های LED تا ۸۰٪ برق کمتری مصرف می‌کنند و عمر بسیار طولانی‌تری دارند.'},
+  {q:'چرا باید شارژر و کنسول بازی را در حالت آماده‌به‌کار از برق بکشیم؟',opts:['در حالت خاموش هم برق مخفی مصرف می‌کنند','فقط برای زیبایی','تاثیری ندارد','باعث خنک شدن خانه می‌شود'],a:0,exp:'حالت آماده‌به‌کار تا ۱۰٪ قبض برق خانه را هدر می‌دهد!'},
+  {q:'بهترین زمان روشن کردن ماشین لباسشویی و ظرفشویی چه وقتی است؟',opts:['ساعت ۲۰ شب','بعد از ساعت ۲۳ یا صبح زود','ساعت ۲۱ شب','فرقی ندارد'],a:1,exp:'در ساعات کم‌باری (شبانه یا صبح زود) تعرفه برق ارزان‌تر است.'}
+];
+let qIdx=0, qScore=0, qLocked=false;
+
+function renderQuiz(){
+  const box=$('#quizBox'); if(!box)return;
+  if(qIdx>=QUIZ.length){
+    box.innerHTML=`<div style="text-align:center;padding:12px 4px">
+      <div style="width:52px;height:52px;border-radius:16px;background:var(--emerald);color:#fff;display:grid;place-items:center;margin:0 auto 10px">${icon('trophy',2.2)}</div>
+      <b style="font-size:17px;display:block">کوییز تمام شد!</b>
+      <p style="font-size:13px;color:var(--ink2);margin:6px 0 14px">شما به <b style="color:var(--emerald-ink)">${fa(qScore)} از ${fa(QUIZ.length)}</b> سوال پاسخ درست دادید.</p>
+      <button type="button" class="btn v sm" onclick="qIdx=0;qScore=0;qLocked=false;renderQuiz()">بازی مجدد کوییز</button>
+    </div>`;
+    return;
+  }
+  const cur=QUIZ[qIdx];
+  box.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span class="tag violet num">سوال ${fa(qIdx+1)} از ${fa(QUIZ.length)}</span>
+      <span class="tag dn num">امتیاز درست: ${fa(qScore)}</span>
+    </div>
+    <div class="quiz-q">${cur.q}</div>
+    <div class="quiz-opts">${cur.opts.map((o,i)=>`<button type="button" class="q-opt" id="qo-${i}" onclick="answerQuiz(${i},this)"><span>${['الف','ب','ج','د'][i]})</span><span>${o}</span></button>`).join('')}</div>
+    <div id="qExp"></div>`;
+}
+function answerQuiz(i,btn){
+  if(qLocked)return; qLocked=true;
+  const cur=QUIZ[qIdx], ok=i===cur.a;
+  $$('.q-opt').forEach(b=>b.disabled=true);
+  $('#qo-'+cur.a).classList.add('ok');
+  if(!ok){btn.classList.add('no');playSfx('buzz')}
+  else{qScore++;addPoints(50,btn);confetti(btn)}
+  $('#qExp').innerHTML=`<div class="quiz-exp"><b>${ok?'آفرین! درست گفتی (+۵۰ امتیاز)':'پاسخ درست مشخص شد'}</b><br>${cur.exp}</div>
+    <button type="button" class="btn p sm" style="width:100%;margin-top:10px" onclick="qIdx++;qLocked=false;renderQuiz()">${qIdx===QUIZ.length-1?'مشاهدهٔ نتیجه':'سوال بعدی ←'}</button>`;
+}
+
+/* ==========================================================================
+   8. REWARDS & LUCKY WHEEL
+   ========================================================================== */
+let rot=0, spinning=false;
+const CP=[
+  {v:'۱۵٪',l:'تخفیف قبض برق',t:'اعمال روی قبض آذر ۱۴۰۵',c:1200,used:false},
+  {v:'۱۰٪',l:'تخفیف قبض گاز',t:'برای قبض‌های زیر الگوی مصرف',c:900,used:false},
+  {v:'۲۰٪',l:'سرویس کولر و پکیج',t:'شبکهٔ تعمیرکاران تأییدشده',c:600,used:false},
+  {v:'رایگان',l:'بستهٔ ۴ عددی لامپ LED',t:'ارسال رایگان به سراسر کشور',c:1500,used:false}
+];
+
+function renderRewards(){
+  syncAllPointsUI();
+  $('#coupons').innerHTML=CP.map((c,i)=>`
+    <div class="coupon ${c.used?'used':''}">
+      <div class="l"><div><b class="num">${c.v}</b><br><small>${c.used?'فعال شد':'تخفیف'}</small></div></div>
+      <div class="r"><b>${c.l}</b><small>${c.t}</small>
+        <div class="ft"><small class="num">${fa(c.c)} امتیاز</small>
+        <button type="button" class="btn ${c.used?'g':'p'} sm" onclick="useCp(${i},this)" ${c.used?'disabled':''}>${c.used?'✓ فعال':'فعال‌سازی'}</button></div>
+      </div>
+    </div>`).join('');
+  $('#winners').innerHTML=[
+    ['خانوادهٔ نوری','قبض یک ماه رایگان','trophy','#F59E0B'],
+    ['خانوادهٔ کریمی','ترموستات هوشمند','thermo','#06B6D4'],
+    ['خانوادهٔ صادقی','کوپن ۵۰۰ هزار تومانی','gift','#8B5CF6'],
+    ['خانوادهٔ حسینی','بستهٔ لامپ LED','bulb','#10B981']
+  ].map(w=>`<div class="rowi"><div class="ic" style="background:${w[3]}">${icon(w[2])}</div><div class="t"><b>${w[0]}</b><small>${w[1]}</small></div><span class="tag n">مهر</span></div>`).join('');
+  if(!$('#wheel').innerHTML) buildWheel();
+}
+function useCp(i,btn){
+  const c=CP[i];
+  if(state.pts<c.c){playSfx('buzz');toast('امتیاز کافی ندارید؛ با ماموریت‌ها و کوییز امتیاز جمع کنید');return}
+  c.used=true; addPoints(-c.c,btn); renderRewards(); playSfx('win'); confetti(btn);
+  toast(`${c.l} فعال شد و ${fa(c.c)} امتیاز کسر شد!`);
+}
+function redeem(btn){
+  if(state.pts<500){playSfx('buzz');toast('حداقل ۵۰۰ امتیاز لازم است');return}
+  addPoints(-500,btn); playSfx('win'); confetti(btn);
+  toast('۵۰٬۰۰۰ تومان تخفیف روی قبض بعدی شما اعمال شد!');
+}
+function plantRealSapling(btn){
+  if(state.pts<500){playSfx('buzz');toast('حداقل ۵۰۰ امتیاز برای کاشت نهال واقعی لازم است');return}
+  addPoints(-500,btn); playSfx('win'); confetti(btn);
+  toast('یک نهال واقعی به نام خانوادهٔ محمدی ثبت شد!');
+}
+
+const WP=['۱۰۰ امتیاز','تخفیف ۱۰٪','لامپ LED','۵۰۰ امتیاز','پوچ!','ترموستات','۲۰۰ امتیاز','قبض رایگان'];
+const WC=['#10B981','#06B6D4','#8B5CF6','#F59E0B','#475569','#EC4899','#3B82F6','#EF4444'];
+function buildWheel(){
+  const s=$('#wheel'), n=WP.length; let h='';
+  WP.forEach((p,i)=>{
+    const a0=(i/n)*Math.PI*2-Math.PI/2, a1=((i+1)/n)*Math.PI*2-Math.PI/2, am=(a0+a1)/2;
+    h+=`<path d="M100 100 L${100+96*Math.cos(a0)} ${100+96*Math.sin(a0)} A96 96 0 0 1 ${100+96*Math.cos(a1)} ${100+96*Math.sin(a1)}Z" fill="${WC[i]}" stroke="#fff" stroke-width="2"/>
+      <text x="${100+62*Math.cos(am)}" y="${100+62*Math.sin(am)}" fill="#fff" font-size="9.5" font-weight="800" text-anchor="middle" dominant-baseline="middle" transform="rotate(${am*180/Math.PI+90} ${100+62*Math.cos(am)} ${100+62*Math.sin(am)})">${p}</text>`;
+  });
+  s.innerHTML=h+'<circle cx="100" cy="100" r="97" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="4"/>';
+}
+function spin(){
+  if(spinning)return;
+  if(!state.chances){playSfx('buzz');toast('شانس‌های این ماه تمام شد؛ ماه بعد دوباره امتحان کنید');return}
+  spinning=true; state.chances--; playSfx('click');
+  const n=WP.length, k=Math.floor(Math.random()*n);
+  rot+=360*6+(360-(k+.5)*360/n)-(rot%360);
+  $('#wheel').style.transform=`rotate(${rot}deg)`;
+  $('#spinBtn').textContent='در حال چرخش…';
+  setTimeout(()=>{
+    spinning=false;
+    $('#chanceSub').textContent=state.chances?`شما ${fa(state.chances)} شانس در گردونهٔ آذر دارید`:'شانس‌های این ماه تمام شد';
+    $('#spinBtn').textContent=state.chances?`چرخاندن گردونهٔ شانس (${fa(state.chances)} شانس)`:'شانس‌های این ماه تمام شد';
+    const p=WP[k];
+    if(p==='پوچ!'){playSfx('buzz');toast('این بار پوچ شد! دوباره امتحان کن')}
+    else{
+      const m=p.match(/[۰-۹]+/);
+      if(m&&p.includes('امتیاز')){
+        const val=+m[0].replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+        addPoints(val,$('#wheel'));
+      }else playSfx('win');
+      toast('تبریک! جایزهٔ شما: «'+p+'»'); confetti($('#wheel'));
+    }
+  },5100);
+}
+function tick(){
+  const target=new Date('2026-12-21T20:00:00+03:30');
+  let d=Math.max(0,target-new Date()); if(d<=0)d=9*864e5+5*36e5;
+  const u=[[Math.floor(d/864e5),'روز'],[Math.floor(d/36e5)%24,'ساعت'],[Math.floor(d/6e4)%60,'دقیقه'],[Math.floor(d/1e3)%60,'ثانیه']];
+  if($('#cd')) $('#cd').innerHTML=u.map(x=>`<div><b class="num">${fa(x[0])}</b><small>${x[1]}</small></div>`).join('');
+}
+setInterval(tick,1000); tick();
+
+/* ==========================================================================
+   THEME TOGGLE & INIT
+   ========================================================================== */
+function initThemeToggle(){
+  const root=document.documentElement, btn=$('#themeToggle'); if(!btn)return;
+  const apply=theme=>{
+    root.dataset.theme=theme;
+    const dark=theme==='dark';
+    btn.innerHTML=icon(dark?'sun':'moon');
+    btn.title=dark?'فعال‌کردن حالت روشن':'فعال‌کردن حالت تیره';
+    btn.setAttribute('aria-pressed',String(dark));
+  };
+  apply(root.dataset.theme||'light');
+  btn.addEventListener('click',()=>{
+    playSfx('click');
+    const next=root.dataset.theme==='dark'?'light':'dark';
+    apply(next);
+    try{localStorage.setItem('energy-theme',next)}catch(e){}
+  });
+}
+
+const RENDER={
+  dash:()=>{if(!rendered.dash)renderDash();else{drawMain();drawHourly()}},
+  smarthome:renderSmartHome,
+  bills:renderBills,
+  recs:renderRecs,
+  sim:()=>{renderSimUI();simUpdate()},
+  garden:()=>{garden(state.gardenEff);renderGardenSide()},
+  league:()=>{renderLeague();renderLeagueSide()},
+  rewards:renderRewards
+};
+
+hydrate();
+initThemeToggle();
+initSearch();
+renderNotifs();
+syncAllPointsUI();
+
+$$('#nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.v)));
+const MOB_LABELS={dash:'داشبورد',smarthome:'هوشمند',bills:'قبض',recs:'ماموریت‌ها',sim:'شبیه‌ساز',garden:'باغ',league:'لیگ',rewards:'جوایز'};
+$('#mobnav').innerHTML=$$('#nav button').map(b=>`<button type="button" data-v="${b.dataset.v}" aria-label="${TITLES[b.dataset.v][0]}">${b.querySelector('svg').outerHTML}<span>${MOB_LABELS[b.dataset.v]}</span></button>`).join('');
+$$('#mobnav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.v)));
+
+let rz;
+addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{
+  const cur=$('.view.on'); if(!cur)return;
+  const v=cur.id.slice(2);
+  if(v==='dash'){drawMain();drawHourly()}
+  if(v==='sim') simUpdate();
+},180)});
+
+go('dash');
+</script>
+</body>
+</html>
